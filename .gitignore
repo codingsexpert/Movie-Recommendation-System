@@ -1,3 +1,13 @@
+# Python virtual environment & cache
+.venv/
+venv/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
 # Node dependencies
 node_modules/
 
@@ -20,3 +30,5 @@ yarn-error.log*
 .idea/
 *.swp
 *.swo
+
+
