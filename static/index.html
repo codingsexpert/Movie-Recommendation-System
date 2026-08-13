@@ -1,31 +1,37 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MovieGraph AI — Next-Gen Cinema Streaming & Recommendation Platform</title>
+  <title>MovieGraph AI — Intelligent Cinema Discovery & Recommendation Platform</title>
+  <meta name="description" content="AI-powered movie recommendation engine using Knowledge Graphs, Vector Search, and Large Language Models to deliver Netflix-quality cinematic discovery.">
+
   <!-- Google Fonts: Inter & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  
+
   <!-- Marked parser for rendering markdown answers -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- Vis.js for 2D Interactive Neo4j Subgraph Canvas -->
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
 </head>
 <body>
 
   <!-- Background Ambient Glow Effects -->
   <div class="ambient-glow glow-1"></div>
   <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
 
-  <!-- Top Glassmorphic Cinema Navbar -->
+  <!-- ═══════════ Glassmorphic Cinema Navbar ═══════════ -->
   <header class="navbar">
     <div class="brand">
       <div class="brand-logo">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
           <line x1="7" y1="2" x2="7" y2="22"></line>
           <line x1="17" y1="2" x2="17" y2="22"></line>
@@ -45,7 +51,7 @@
     <!-- Center Navigation Links -->
     <nav class="nav-links">
       <a href="#catalogSection" class="nav-link active">Catalog</a>
-      <a href="#searchSection" class="nav-link">AI Recommendations</a>
+      <a href="#searchSection" class="nav-link">AI Search</a>
       <a href="#graphSection" class="nav-link">Knowledge Graph</a>
     </nav>
 
@@ -53,44 +59,66 @@
       <!-- Database Connection Status Pills -->
       <div class="status-badge">
         <span class="dot green"></span>
-        <span id="neo4jStatus">Neo4j (272 Nodes)</span>
+        <span id="neo4jStatus">Neo4j</span>
       </div>
       <div class="status-badge">
         <span class="dot purple"></span>
-        <span id="pineconeStatus">Pinecone Vectors</span>
+        <span id="pineconeStatus">Pinecone</span>
       </div>
-      <button class="theme-btn" id="themeToggleBtn">Light Mode</button>
+      <button class="theme-btn" id="themeToggleBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <span>Light</span>
+      </button>
     </div>
   </header>
 
-  <!-- Hero Spotlight Banner (Streaming Platform Feature) -->
-  <section class="hero-spotlight">
+  <!-- ═══════════ Hero Spotlight Banner (Netflix-Style) ═══════════ -->
+  <section class="hero-spotlight" id="heroSpotlight">
+    <div class="spotlight-bg" id="spotlightBg" style="background-image: url('https://image.tmdb.org/t/p/w1280/8ZTVqvKDQ8emSGUEMjsS4yHAiE.jpg');"></div>
     <div class="spotlight-overlay"></div>
+
     <div class="spotlight-content">
       <div class="spotlight-badge">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        <span>SPOTLIGHT MOVIE OF THE DAY</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <span>SPOTLIGHT OF THE DAY</span>
       </div>
+
       <h1 class="spotlight-title" id="spotlightTitle">Inception</h1>
+
       <div class="spotlight-meta">
         <span class="meta-year" id="spotlightYear">2010</span>
-        <span class="meta-director" id="spotlightDirector">Dir. Christopher Nolan</span>
-        <span class="meta-award">Oscar Winner</span>
+        <span class="meta-divider"></span>
+        <span class="meta-director" id="spotlightDirector">Christopher Nolan</span>
+        <span class="meta-divider"></span>
         <span class="meta-genre">Sci-Fi • Action • Thriller</span>
+        <span class="meta-divider"></span>
+        <span class="meta-award">🏆 Oscar Winner</span>
+        <span class="spotlight-rating" id="spotlightRating">⭐ 8.8</span>
       </div>
-      <p class="spotlight-desc" id="spotlightDesc">A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.</p>
-      
+
+      <p class="spotlight-desc" id="spotlightDesc">A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O., blurring the lines between reality and the subconscious.</p>
+
       <div class="spotlight-actions">
         <button class="btn-primary" id="spotlightRecommendBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>Find Movies Like Inception</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span>Find Similar Movies</span>
         </button>
         <button class="btn-trailer" id="spotlightTrailerBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
           <span>Watch Trailer</span>
         </button>
         <button class="btn-secondary" id="spotlightGraphBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
           <span>Explore Graph</span>
         </button>
       </div>
@@ -98,32 +126,32 @@
   </section>
 
 
-  <!-- Main Platform Container -->
+  <!-- ═══════════ Main Platform Container ═══════════ -->
   <main class="platform-container">
 
     <!-- AI Search & Recommendation Section -->
     <section class="search-section" id="searchSection">
       <div class="section-title-box">
-        <h2>AI Conversational GraphRAG Search</h2>
-        <p>Ask in English or Hinglish to query our Knowledge Graph & Pinecone vector space.</p>
+        <h2>AI-Powered Movie Search</h2>
+        <p>Ask natural language questions in English or Hinglish — our GraphRAG engine queries the Knowledge Graph & Pinecone vectors.</p>
       </div>
 
       <form id="searchForm" class="search-box">
-        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        
-        <input 
-          type="text" 
-          id="queryInput" 
-          placeholder="e.g. Recommend movies similar to Interstellar or Nolan ki sabse acchi movie konsi hai" 
-          autocomplete="off" 
-          required 
+
+        <input
+          type="text"
+          id="queryInput"
+          placeholder="e.g. Recommend movies similar to Interstellar..."
+          autocomplete="off"
+          required
         />
 
         <button type="button" id="micBtn" class="mic-btn" title="Voice Search">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
             <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
             <line x1="12" y1="19" x2="12" y2="23"></line>
@@ -132,34 +160,34 @@
         </button>
 
         <button type="submit" id="searchBtn" class="submit-btn">
-          <span>Ask AI Engine</span>
+          <span>Ask AI</span>
         </button>
       </form>
 
       <!-- Quick Prompt Chips -->
       <div class="quick-prompts">
-        <span class="label">Suggested AI Searches:</span>
+        <span class="label">Try:</span>
         <button class="prompt-chip" data-query="Recommend movies similar to Inception">Similar to Inception</button>
-        <button class="prompt-chip" data-query="Nolan ki sabse acchi movie konsi hai">Nolan Best Movies (Hinglish)</button>
+        <button class="prompt-chip" data-query="Nolan ki sabse acchi movie konsi hai">Best Nolan (Hinglish)</button>
         <button class="prompt-chip" data-query="Which movies directed by Christopher Nolan won Oscars?">Nolan Oscar Winners</button>
-        <button class="prompt-chip" data-query="What movies has Leonardo DiCaprio acted in?">Leonardo DiCaprio Movies</button>
+        <button class="prompt-chip" data-query="What movies has Leonardo DiCaprio acted in?">DiCaprio Filmography</button>
       </div>
     </section>
 
     <!-- Loading Indicator -->
     <div id="loadingIndicator" class="loading-box hidden">
       <div class="spinner"></div>
-      <p>Executing GraphRAG traversal & Pinecone vector search...</p>
+      <p>Executing GraphRAG traversal & vector similarity search...</p>
     </div>
 
     <!-- AI Recommendation Answer Result Card -->
     <section id="resultsSection" class="results-card hidden">
       <div class="card-header">
         <div class="header-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          <h3>AI Recommendations & Graph Insights</h3>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <h3>AI Recommendations & Insights</h3>
         </div>
-        <button id="copyBtn" class="copy-btn">Copy Output</button>
+        <button id="copyBtn" class="copy-btn">Copy</button>
       </div>
       <div id="answerContent" class="markdown-body">
         <!-- Rendered AI Output -->
@@ -170,13 +198,13 @@
     <section id="graphSection" class="graph-card hidden">
       <div class="card-header">
         <div class="header-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-          <h3>Interactive Subgraph Visualizer</h3>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          <h3>Knowledge Graph Visualizer</h3>
         </div>
         <div class="graph-controls">
           <button id="zoomInBtn" class="ctrl-btn">+</button>
-          <button id="zoomOutBtn" class="ctrl-btn">-</button>
-          <button id="resetFitBtn" class="ctrl-btn">Fit View</button>
+          <button id="zoomOutBtn" class="ctrl-btn">−</button>
+          <button id="resetFitBtn" class="ctrl-btn">Fit</button>
         </div>
       </div>
 
@@ -196,13 +224,13 @@
     <section class="catalog-section" id="catalogSection">
       <div class="catalog-header">
         <div class="section-title-box">
-          <h2>Full Movie Catalog</h2>
-          <p>Browse our Knowledge Graph dataset of legendary blockbuster films.</p>
+          <h2>Movie Catalog</h2>
+          <p>Browse our curated collection of legendary blockbuster films.</p>
         </div>
 
         <!-- Filter Bar -->
         <div class="filter-tabs" id="filterTabs">
-          <button class="tab-btn active" data-filter="all">All Movies</button>
+          <button class="tab-btn active" data-filter="all">All</button>
           <button class="tab-btn" data-filter="Sci-Fi">Sci-Fi</button>
           <button class="tab-btn" data-filter="Action">Action</button>
           <button class="tab-btn" data-filter="Drama">Drama</button>
@@ -211,22 +239,27 @@
         </div>
       </div>
 
-      <!-- Movie Cards Streaming Grid -->
+      <!-- Movie Cards Grid -->
       <div class="movie-grid" id="movieGrid">
-        <!-- Rendered movie cards -->
+        <!-- Rendered dynamically by app.js -->
       </div>
     </section>
 
   </main>
 
-  <!-- Video Trailer Modal Overlay -->
+  <!-- ═══════════ Footer ═══════════ -->
+  <footer class="footer">
+    <p>MovieGraph AI &middot; Built with <a href="https://neo4j.com" target="_blank" rel="noopener">Neo4j</a>, <a href="https://pinecone.io" target="_blank" rel="noopener">Pinecone</a>, and <a href="https://deepmind.google/technologies/gemini/" target="_blank" rel="noopener">Gemini</a> &middot; &copy; 2024</p>
+  </footer>
+
+  <!-- ═══════════ Video Trailer Modal Overlay ═══════════ -->
   <div id="trailerModal" class="trailer-modal hidden">
     <div class="trailer-modal-backdrop" id="trailerBackdrop"></div>
     <div class="trailer-modal-content">
       <button class="trailer-close-btn" id="closeTrailerBtn">&times;</button>
       <h3 class="trailer-title" id="trailerModalTitle">Movie Trailer</h3>
       <div class="video-container">
-        <iframe id="trailerIframe" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <iframe id="trailerIframe" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
     </div>
   </div>
@@ -234,4 +267,3 @@
   <script src="app.js"></script>
 </body>
 </html>
-
