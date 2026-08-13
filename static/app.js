@@ -56,6 +56,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Trailer Modal Elements
+  const trailerModal = document.getElementById('trailerModal');
+  const trailerIframe = document.getElementById('trailerIframe');
+  const trailerModalTitle = document.getElementById('trailerModalTitle');
+  const closeTrailerBtn = document.getElementById('closeTrailerBtn');
+  const trailerBackdrop = document.getElementById('trailerBackdrop');
+  const spotlightTrailerBtn = document.getElementById('spotlightTrailerBtn');
+
+  function openTrailer(title, url) {
+    if (!url) {
+      url = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(title + ' official trailer')}`;
+    }
+    trailerModalTitle.innerText = `${title} — Official Trailer`;
+    trailerIframe.src = url.includes('autoplay') ? url : `${url}?autoplay=1`;
+    trailerModal.classList.remove('hidden');
+  }
+
+  function closeTrailer() {
+    trailerIframe.src = '';
+    trailerModal.classList.add('hidden');
+  }
+
+  if (closeTrailerBtn) closeTrailerBtn.addEventListener('click', closeTrailer);
+  if (trailerBackdrop) trailerBackdrop.addEventListener('click', closeTrailer);
+
   function renderMovieGrid(movies) {
     movieGrid.innerHTML = '';
     if (!movies || movies.length === 0) {
@@ -73,14 +98,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const genresHtml = (movie.genres || []).map(g => `<span class="genre-pill">${g}</span>`).join('');
       const directorsText = movie.directors && movie.directors.length > 0 ? movie.directors.join(', ') : 'N/A';
       const actorsText = movie.actors && movie.actors.length > 0 ? movie.actors.slice(0, 3).join(', ') : 'N/A';
+      const posterUrl = movie.poster || `https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80`;
+      const ratingText = movie.rating ? `⭐ ${movie.rating}` : '⭐ 8.5';
 
       card.innerHTML = `
-        <div class="card-poster">
+        <div class="card-poster" style="background-image: url('${posterUrl}');">
+          <div class="poster-overlay"></div>
           <div class="poster-badge-row">
             <span class="year-badge">${movie.year || 'N/A'}</span>
+            <span class="rating-pill">${ratingText}</span>
             ${awardLabel ? `<span class="award-pill">🏆 ${awardLabel}</span>` : ''}
           </div>
-          <h3 class="poster-title">${movie.title}</h3>
+          <div class="poster-content">
+            <h3 class="poster-title">${movie.title}</h3>
+          </div>
         </div>
         <div class="card-body">
           <div class="card-meta-line"><strong>Dir:</strong> ${directorsText}</div>
@@ -88,19 +119,25 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="card-genres">${genresHtml}</div>
           <div class="card-actions">
             <button class="btn-card-recommend" data-title="${movie.title}">More Like This</button>
-            <button class="btn-card-graph" data-title="${movie.title}">View Graph</button>
+            <button class="btn-card-trailer" data-title="${movie.title}">Trailer</button>
+            <button class="btn-card-graph" data-title="${movie.title}">Graph</button>
           </div>
         </div>
       `;
 
       // Event listeners on card buttons
       const recBtn = card.querySelector('.btn-card-recommend');
+      const trlBtn = card.querySelector('.btn-card-trailer');
       const grpBtn = card.querySelector('.btn-card-graph');
 
       recBtn.addEventListener('click', () => {
         const q = `Recommend movies similar to ${movie.title}`;
         queryInput.value = q;
         executeSearch(q);
+      });
+
+      trlBtn.addEventListener('click', () => {
+        openTrailer(movie.title, movie.trailer);
       });
 
       grpBtn.addEventListener('click', () => {
@@ -140,12 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (spotlightTrailerBtn) {
+    spotlightTrailerBtn.addEventListener('click', () => {
+      openTrailer('Inception', 'https://www.youtube.com/embed/YoHD9XEInc0');
+    });
+  }
+
   if (spotlightGraphBtn) {
     spotlightGraphBtn.addEventListener('click', () => {
       renderGraphCanvas('Inception');
       graphSection.scrollIntoView({ behavior: 'smooth' });
     });
   }
+
 
   // Voice Search
   if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {

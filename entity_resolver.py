@@ -137,7 +137,33 @@ def resolve_entity(entity_name: str) -> list[dict]:
     if exact_matches:
         return exact_matches
 
+    if matches:
+        return matches
+
+    # 3. Fuzzy match fallback using difflib if driver is available
+    if driver:
+        try:
+            import difflib
+            with driver.session() as session:
+                for node_type in NODE_TYPES:
+                    label = node_type["label"]
+                    property_name = node_type["property"]
+                    res = session.run(f"MATCH (n:{label}) RETURN n.{property_name} AS name LIMIT 200")
+                    all_names = [r["name"] for r in res if r["name"]]
+                    close = difflib.get_close_matches(entity_name, all_names, n=1, cutoff=0.6)
+                    if close:
+                        matches.append({
+                            "searchTerm": entity_name,
+                            "label": label,
+                            "nodeName": close[0],
+                            "matchType": "fuzzy"
+                        })
+                        break
+        except Exception as err:
+            pass
+
     return matches
+
 
 def resolve_query_entities(query: str) -> dict:
     """Extract entities from query -> Resolve each in Neo4j."""

@@ -97,44 +97,150 @@ def get_stats():
 
     return stats
 
+FALLBACK_CATALOG = [
+    {
+        "title": "Inception", "year": 2010, "rating": 8.8,
+        "directors": ["Christopher Nolan"],
+        "actors": ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page", "Tom Hardy"],
+        "genres": ["Sci-Fi", "Action", "Thriller"],
+        "themes": ["Dreams", "Reality", "Subconscious"],
+        "awards": ["Oscar Winner (4 Academy Awards)"],
+        "poster": "https://image.tmdb.org/t/p/w500/oYuLE1hYm1CYjFAbVPIbDEmBwwM.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/8ZTVqvKDQ8emSGUEMjsS4yHAiE.jpg",
+        "trailer": "https://www.youtube.com/embed/YoHD9XEInc0"
+    },
+    {
+        "title": "Interstellar", "year": 2014, "rating": 8.7,
+        "directors": ["Christopher Nolan"],
+        "actors": ["Matthew McConaughey", "Anne Hathaway", "Jessica Chastain"],
+        "genres": ["Sci-Fi", "Drama", "Adventure"],
+        "themes": ["Black Holes", "Time Dilation", "Love & Gravity"],
+        "awards": ["Oscar Winner (Best Visual Effects)"],
+        "poster": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/xJHokMbljvjADYdit5fKSuV0Sc.jpg",
+        "trailer": "https://www.youtube.com/embed/zSWdZVtXT7E"
+    },
+    {
+        "title": "The Dark Knight", "year": 2008, "rating": 9.0,
+        "directors": ["Christopher Nolan"],
+        "actors": ["Christian Bale", "Heath Ledger", "Aaron Eckhart"],
+        "genres": ["Action", "Crime", "Drama"],
+        "themes": ["Justice", "Chaos", "Heroism"],
+        "awards": ["Oscar Winner (Heath Ledger Best Supporting Actor)"],
+        "poster": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/nMK2819TyQvW2guWZ5CS2hZXIw.jpg",
+        "trailer": "https://www.youtube.com/embed/EXeTwQWrcwY"
+    },
+    {
+        "title": "Oppenheimer", "year": 2023, "rating": 8.9,
+        "directors": ["Christopher Nolan"],
+        "actors": ["Cillian Murphy", "Emily Blunt", "Matt Damon", "Robert Downey Jr."],
+        "genres": ["Biography", "Drama", "History"],
+        "themes": ["Atomic Age", "Moral Dilemma", "Manhattan Project"],
+        "awards": ["Oscar Winner (7 Academy Awards incl. Best Picture)"],
+        "poster": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGvC271PqY.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/fm6K8Ofi0Rs2R6hEGUYevjUvy20.jpg",
+        "trailer": "https://www.youtube.com/embed/uYPbbksJxIg"
+    },
+    {
+        "title": "Shutter Island", "year": 2010, "rating": 8.2,
+        "directors": ["Martin Scorsese"],
+        "actors": ["Leonardo DiCaprio", "Mark Ruffalo", "Ben Kingsley"],
+        "genres": ["Mystery", "Thriller", "Psychological"],
+        "themes": ["Mental Asylum", "Delusion", "Guilt"],
+        "awards": ["National Board of Review Winner"],
+        "poster": "https://image.tmdb.org/t/p/w500/4BgSWGIpPOmBZGFdMfwFWOf2D9Y.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/w7kWbE2fXbJ4dC41sQhU9o6t0mY.jpg",
+        "trailer": "https://www.youtube.com/embed/5iaYLCiq5RM"
+    },
+    {
+        "title": "The Matrix", "year": 1999, "rating": 8.7,
+        "directors": ["Lana Wachowski", "Lilly Wachowski"],
+        "actors": ["Keanu Reeves", "Laurence Fishburne", "Carrie-Anne Moss"],
+        "genres": ["Sci-Fi", "Action"],
+        "themes": ["Simulated Reality", "Cyberpunk", "Free Will"],
+        "awards": ["Oscar Winner (4 Academy Awards)"],
+        "poster": "https://image.tmdb.org/t/p/w500/f89U3w9nYiBAbsfWivHCPOK20d8.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/5v6n6uP3lJ78vK2Cg93W55xW90d.jpg",
+        "trailer": "https://www.youtube.com/embed/vKQi3bBA1y8"
+    },
+    {
+        "title": "Dune: Part Two", "year": 2024, "rating": 8.6,
+        "directors": ["Denis Villeneuve"],
+        "actors": ["Timothée Chalamet", "Zendaya", "Rebecca Ferguson", "Javier Bardem"],
+        "genres": ["Sci-Fi", "Adventure", "Action"],
+        "themes": ["Prophecy", "Desert Planet", "Empire"],
+        "awards": ["Blockbuster Critical Acclaim"],
+        "poster": "https://image.tmdb.org/t/p/w500/1pdfLPoLMag8StABMwMvChg7rvi.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/xOM08Go8DFBhidHYxP6yA46UTv8.jpg",
+        "trailer": "https://www.youtube.com/embed/Way9Dexny3w"
+    },
+    {
+        "title": "Pulp Fiction", "year": 1994, "rating": 8.9,
+        "directors": ["Quentin Tarantino"],
+        "actors": ["John Travolta", "Uma Thurman", "Samuel L. Jackson"],
+        "genres": ["Crime", "Drama"],
+        "themes": ["Non-linear Storytelling", "Redemption", "Los Angeles Underworld"],
+        "awards": ["Oscar Winner (Best Screenplay)"],
+        "poster": "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/suaEOtk1N1sgg2MTM7oHO2z83S5.jpg",
+        "trailer": "https://www.youtube.com/embed/s7EdQ4FqbhY"
+    }
+]
+
 @app.get("/api/all_movies")
 def get_all_movies():
     """Fetch list of all movie titles for selector dropdowns."""
-    try:
-        with driver.session() as session:
-            res = session.run("MATCH (m:Movie) RETURN coalesce(m.title, m.name) AS title ORDER BY title ASC")
-            return [r["title"] for r in res if r["title"]]
-    except Exception as e:
-        return []
+    if driver:
+        try:
+            with driver.session() as session:
+                res = session.run("MATCH (m:Movie) RETURN coalesce(m.title, m.name) AS title ORDER BY title ASC")
+                titles = [r["title"] for r in res if r["title"]]
+                if titles:
+                    return titles
+        except Exception:
+            pass
+    return [m["title"] for m in FALLBACK_CATALOG]
 
 @app.get("/api/catalog")
 def get_catalog_movies():
     """Fetch full rich movie cards list for the streaming catalog UI."""
-    try:
-        with driver.session() as session:
-            res = session.run("""
-                MATCH (m:Movie)
-                OPTIONAL MATCH (d:Director)-[:DIRECTED]->(m)
-                OPTIONAL MATCH (a:Actor)-[:ACTED_IN]->(m)
-                OPTIONAL MATCH (m)-[:BELONGS_TO]->(g:Genre)
-                OPTIONAL MATCH (m)-[:EXPLORES]->(t:Theme)
-                OPTIONAL MATCH (m)-[:WON]->(aw:Award)
-                RETURN coalesce(m.title, m.name) AS title, m.year AS year,
-                       collect(DISTINCT d.name) AS directors,
-                       collect(DISTINCT a.name) AS actors,
-                       collect(DISTINCT g.name) AS genres,
-                       collect(DISTINCT t.name) AS themes,
-                       collect(DISTINCT aw.name) AS awards
-                ORDER BY m.year DESC, title ASC
-            """)
-            movies = []
-            for r in res:
-                if r["title"]:
-                    movie_dict = dict(r)
-                    movies.append(movie_dict)
-            return movies
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    if driver:
+        try:
+            with driver.session() as session:
+                res = session.run("""
+                    MATCH (m:Movie)
+                    OPTIONAL MATCH (d:Director)-[:DIRECTED]->(m)
+                    OPTIONAL MATCH (a:Actor)-[:ACTED_IN]->(m)
+                    OPTIONAL MATCH (m)-[:BELONGS_TO]->(g:Genre)
+                    OPTIONAL MATCH (m)-[:EXPLORES]->(t:Theme)
+                    OPTIONAL MATCH (m)-[:WON]->(aw:Award)
+                    RETURN coalesce(m.title, m.name) AS title, m.year AS year,
+                           collect(DISTINCT d.name) AS directors,
+                           collect(DISTINCT a.name) AS actors,
+                           collect(DISTINCT g.name) AS genres,
+                           collect(DISTINCT t.name) AS themes,
+                           collect(DISTINCT aw.name) AS awards
+                    ORDER BY m.year DESC, title ASC
+                """)
+                movies = []
+                for r in res:
+                    if r["title"]:
+                        movie_dict = dict(r)
+                        matching_fb = next((f for f in FALLBACK_CATALOG if f["title"].lower() == movie_dict["title"].lower()), None)
+                        if matching_fb:
+                            movie_dict["poster"] = matching_fb.get("poster")
+                            movie_dict["backdrop"] = matching_fb.get("backdrop")
+                            movie_dict["rating"] = matching_fb.get("rating")
+                            movie_dict["trailer"] = matching_fb.get("trailer")
+                        movies.append(movie_dict)
+                if movies:
+                    return movies
+        except Exception as e:
+            print(f"⚠️ Neo4j catalog query error ({e}), using fallback catalog")
+
+    return FALLBACK_CATALOG
+
 
 @app.get("/api/movie/{title}")
 def get_movie_details(title: str):

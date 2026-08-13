@@ -85,13 +85,18 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
           <span>Find Movies Like Inception</span>
         </button>
+        <button class="btn-trailer" id="spotlightTrailerBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span>Watch Trailer</span>
+        </button>
         <button class="btn-secondary" id="spotlightGraphBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-          <span>Explore Knowledge Graph</span>
+          <span>Explore Graph</span>
         </button>
       </div>
     </div>
   </section>
+
 
   <!-- Main Platform Container -->
   <main class="platform-container">
@@ -214,11 +219,19 @@
 
   </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p>MovieGraph AI Cinema Platform • Engine powered by Neo4j Knowledge Graph, Pinecone Vector DB & Gemini 2.5 Flash</p>
-  </footer>
+  <!-- Video Trailer Modal Overlay -->
+  <div id="trailerModal" class="trailer-modal hidden">
+    <div class="trailer-modal-backdrop" id="trailerBackdrop"></div>
+    <div class="trailer-modal-content">
+      <button class="trailer-close-btn" id="closeTrailerBtn">&times;</button>
+      <h3 class="trailer-title" id="trailerModalTitle">Movie Trailer</h3>
+      <div class="video-container">
+        <iframe id="trailerIframe" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
 </html>
+
