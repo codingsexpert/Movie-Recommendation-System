@@ -2,50 +2,77 @@ import re
 from config import llm, embed_text, pinecone_index, driver
 
 def extract_title_from_chunk(chunk_text: str) -> str | None:
-    """Extract movie title from a raw chunk text."""
-    match = re.search(r"Movie Title:\s*(.+)", chunk_text, re.IGNORECASE)
-    return match.group(1).strip() if match else None
+    """Extract movie title from a raw chunk text with multiple fallback regex patterns."""
+    if not chunk_text:
+        return None
+    match = re.search(r"(?:Movie Title|Title|Movie):\s*(.+)", chunk_text, re.IGNORECASE)
+    if match:
+        return match.group(1).split("\n")[0].strip()
+    first_line = chunk_text.strip().split("\n")[0]
+    first_line_clean = re.sub(r"^[#\*\d\.\s\-\:]+", "", first_line).strip()
+    if 2 <= len(first_line_clean) <= 60:
+        return first_line_clean
+    return None
 
 def get_movie_genres(movie_title: str) -> list[str]:
     """Neo4j: Get genres of a specific movie."""
-    with driver.session() as session:
-        result = session.run(
-            """
-            MATCH (m:Movie)-[:BELONGS_TO]->(g:Genre)
-            WHERE m.title = $title
-            RETURN g.name AS genre
-            """,
-            title=movie_title
-        )
-        return [r["genre"] for r in result]
+    if not driver:
+        return []
+    try:
+        with driver.session() as session:
+            result = session.run(
+                """
+                MATCH (m:Movie)-[:BELONGS_TO]->(g:Genre)
+                WHERE toLower(m.title) = toLower($title)
+                RETURN g.name AS genre
+                """,
+                title=movie_title
+            )
+            return [r["genre"] for r in result]
+    except Exception as e:
+        print(f"⚠️ Neo4j error in get_movie_genres: {e}")
+        return []
 
 def get_movie_themes(movie_title: str) -> list[str]:
     """Neo4j: Get themes of a specific movie."""
-    with driver.session() as session:
-        result = session.run(
-            """
-            MATCH (m:Movie)-[:EXPLORES]->(t:Theme)
-            WHERE m.title = $title
-            RETURN t.name AS theme
-            """,
-            title=movie_title
-        )
-        return [r["theme"] for r in result]
+    if not driver:
+        return []
+    try:
+        with driver.session() as session:
+            result = session.run(
+                """
+                MATCH (m:Movie)-[:EXPLORES]->(t:Theme)
+                WHERE toLower(m.title) = toLower($title)
+                RETURN t.name AS theme
+                """,
+                title=movie_title
+            )
+            return [r["theme"] for r in result]
+    except Exception as e:
+        print(f"⚠️ Neo4j error in get_movie_themes: {e}")
+        return []
 
 def filter_by_genre(movie_titles: list[str], source_genres: list[str]) -> list[dict]:
     """Neo4j: Filter candidate movies sharing at least one genre with source movie."""
-    with driver.session() as session:
-        result = session.run(
-            """
-            MATCH (m:Movie)-[:BELONGS_TO]->(g:Genre)
-            WHERE m.title IN $titles
-            WITH m, collect(g.name) AS genres
-            WHERE any(genre IN genres WHERE genre IN $sourceGenres)
-            RETURN m.title AS title, genres
-            """,
-            titles=movie_titles, sourceGenres=source_genres
-        )
-        return [{"title": r["title"], "genres": r["genres"]} for r in result]
+    if not driver or not movie_titles or not source_genres:
+        return []
+    try:
+        with driver.session() as session:
+            result = session.run(
+                """
+                MATCH (m:Movie)-[:BELONGS_TO]->(g:Genre)
+                WHERE m.title IN $titles
+                WITH m, collect(g.name) AS genres
+                WHERE any(genre IN genres WHERE genre IN $sourceGenres)
+                RETURN m.title AS title, genres
+                """,
+                titles=movie_titles, sourceGenres=source_genres
+            )
+            return [{"title": r["title"], "genres": r["genres"]} for r in result]
+    except Exception as e:
+        print(f"⚠️ Neo4j error in filter_by_genre: {e}")
+        return []
+
 
 def fallback_vector_search(query: str) -> str:
     """Fallback: Pure vector search when no specific movie entity is resolved."""
@@ -73,20 +100,29 @@ def fallback_vector_search(query: str) -> str:
 Here are {len(candidates)} movies from our database:
 {formatted_candidates}
 
-Pick the 10 BEST matches for what the user is looking for.
+Pick the 5 BEST matches for what the user is looking for.
 For each pick, explain in 1-2 sentences WHY it fits.
 Do NOT mention databases, vectors, or technical terms.
 Format as a numbered list."""
 
-    response = llm.invoke([
-        {"role": "system", "content": "You are a movie recommendation expert. Respond ONLY with a numbered list of movie recommendations with short explanations. Never respond with JSON."},
-        {"role": "user", "content": prompt}
-    ])
+    try:
+        response = llm.invoke([
+            {"role": "system", "content": "You are a movie recommendation expert. Respond ONLY with a numbered list of movie recommendations with short explanations. Never respond with JSON."},
+            {"role": "user", "content": prompt}
+        ])
 
-    answer = response.content
-    if isinstance(answer, list):
-        answer = " ".join([b.text if hasattr(b, "text") else str(b) for b in answer])
-    return answer.strip()
+        answer = response.content
+        if isinstance(answer, list):
+            answer = " ".join([b.text if hasattr(b, "text") else str(b) for b in answer])
+        return answer.strip()
+    except Exception as err:
+        print(f"⚠️ Vector search LLM invocation failed ({err}). Formatting offline candidate list directly...")
+        res_lines = ["### Recommended Movie Matches\n\nHere are top matching movies retrieved from our Vector Database:\n"]
+        for idx, text in enumerate(candidates[:5], 1):
+            title = extract_title_from_chunk(text) or f"Match {idx}"
+            clean_text = text[:160].replace('\n', ' ')
+            res_lines.append(f"{idx}. **{title}**\n   - **Overview:** {clean_text}...")
+        return "\n\n".join(res_lines)
 
 def handle_similarity_query(query: str, resolved_entities: dict) -> str:
     """Main similarity handler: Pinecone + Neo4j + LLM."""
@@ -172,7 +208,7 @@ def handle_similarity_query(query: str, resolved_entities: dict) -> str:
 Here are {len(candidate_list)} movies that share at least one genre:
 {formatted_list}
 
-Pick the 10 BEST matches. Rank by:
+Pick the 5 BEST matches. Rank by:
 1. Genre overlap (most important)
 2. Theme similarity (from the chunk text)
 3. Overall vibe/style match
@@ -181,12 +217,20 @@ For each pick, explain in 1-2 sentences WHY it's similar.
 Do NOT mention databases, vectors, scores, or technical terms.
 Format as a numbered list."""
 
-    response = llm.invoke([
-        {"role": "system", "content": "You are a movie recommendation expert. Respond ONLY with a numbered list of movie recommendations with short explanations. Never respond with JSON."},
-        {"role": "user", "content": prompt}
-    ])
+    try:
+        response = llm.invoke([
+            {"role": "system", "content": "You are a movie recommendation expert. Respond ONLY with a numbered list of movie recommendations with short explanations. Never respond with JSON."},
+            {"role": "user", "content": prompt}
+        ])
 
-    answer = response.content
-    if isinstance(answer, list):
-        answer = " ".join([b.text if hasattr(b, "text") else str(b) for b in answer])
-    return answer.strip()
+        answer = response.content
+        if isinstance(answer, list):
+            answer = " ".join([b.text if hasattr(b, "text") else str(b) for b in answer])
+        return answer.strip()
+    except Exception as err:
+        print(f"⚠️ LLM invocation failed ({err}). Formatting offline recommendation list directly from graph database...")
+        res_lines = [f"### Recommended Movies Similar to **{movie_name}**\n\nBased on shared genres (**{', '.join(source_genres)}**) and themes from our Knowledge Graph:\n"]
+        for idx, c in enumerate(candidate_list[:5], 1):
+            overview = c['chunkText'][:160].replace('\n', ' ') if c['chunkText'] else "Matches genre and thematic profile."
+            res_lines.append(f"{idx}. **{c['title']}**\n   - **Genres:** {c['genres']}\n   - **Overview:** {overview}...")
+        return "\n\n".join(res_lines)

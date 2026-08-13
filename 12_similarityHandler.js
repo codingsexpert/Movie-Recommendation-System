@@ -22,9 +22,17 @@ import { llm, embedText, pineconeIndex, driver } from "./2_config.js";
  * Looks for "Movie Title: XYZ" pattern in the chunk.
  */
 function extractTitleFromChunk(chunkText) {
-  const match = chunkText.match(/Movie Title:\s*(.+)/i);
-  return match ? match[1].trim() : null;
+  if (!chunkText) return null;
+  const match = chunkText.match(/(?:Movie Title|Title|Movie):\s*(.+)/i);
+  if (match) return match[1].split("\n")[0].trim();
+  const firstLine = chunkText.trim().split("\n")[0];
+  const cleanFirstLine = firstLine.replace(/^[#\*\d\.\s\-\:]+/, "").trim();
+  if (cleanFirstLine.length >= 2 && cleanFirstLine.length <= 60) {
+    return cleanFirstLine;
+  }
+  return null;
 }
+
 
 /**
  * Neo4j: Get genres of a specific movie.

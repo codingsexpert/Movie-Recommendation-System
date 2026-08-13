@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MovieGraph AI — Next-Gen Cinema Streaming & Recommendation Platform</title>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Marked parser for rendering markdown answers -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Vis.js for 2D Interactive Neo4j Subgraph Canvas -->
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+
+  <!-- Background Ambient Glow Effects -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- Top Glassmorphic Cinema Navbar -->
+  <header class="navbar">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+          <line x1="7" y1="2" x2="7" y2="22"></line>
+          <line x1="17" y1="2" x2="17" y2="22"></line>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <line x1="2" y1="7" x2="7" y2="7"></line>
+          <line x1="2" y1="17" x2="7" y2="17"></line>
+          <line x1="17" y1="17" x2="22" y2="17"></line>
+          <line x1="17" y1="7" x2="22" y2="7"></line>
+        </svg>
+      </div>
+      <div class="brand-title">
+        <h1>MovieGraph <span class="accent">AI</span></h1>
+        <span class="platform-tag">CINEMA PLATFORM</span>
+      </div>
+    </div>
+
+    <!-- Center Navigation Links -->
+    <nav class="nav-links">
+      <a href="#catalogSection" class="nav-link active">Catalog</a>
+      <a href="#searchSection" class="nav-link">AI Recommendations</a>
+      <a href="#graphSection" class="nav-link">Knowledge Graph</a>
+    </nav>
+
+    <div class="nav-right">
+      <!-- Database Connection Status Pills -->
+      <div class="status-badge">
+        <span class="dot green"></span>
+        <span id="neo4jStatus">Neo4j (272 Nodes)</span>
+      </div>
+      <div class="status-badge">
+        <span class="dot purple"></span>
+        <span id="pineconeStatus">Pinecone Vectors</span>
+      </div>
+      <button class="theme-btn" id="themeToggleBtn">Light Mode</button>
+    </div>
+  </header>
+
+  <!-- Hero Spotlight Banner (Streaming Platform Feature) -->
+  <section class="hero-spotlight">
+    <div class="spotlight-overlay"></div>
+    <div class="spotlight-content">
+      <div class="spotlight-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <span>SPOTLIGHT MOVIE OF THE DAY</span>
+      </div>
+      <h1 class="spotlight-title" id="spotlightTitle">Inception</h1>
+      <div class="spotlight-meta">
+        <span class="meta-year" id="spotlightYear">2010</span>
+        <span class="meta-director" id="spotlightDirector">Dir. Christopher Nolan</span>
+        <span class="meta-award">Oscar Winner</span>
+        <span class="meta-genre">Sci-Fi • Action • Thriller</span>
+      </div>
+      <p class="spotlight-desc" id="spotlightDesc">A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.</p>
+      
+      <div class="spotlight-actions">
+        <button class="btn-primary" id="spotlightRecommendBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span>Find Movies Like Inception</span>
+        </button>
+        <button class="btn-secondary" id="spotlightGraphBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          <span>Explore Knowledge Graph</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Platform Container -->
+  <main class="platform-container">
+
+    <!-- AI Search & Recommendation Section -->
+    <section class="search-section" id="searchSection">
+      <div class="section-title-box">
+        <h2>AI Conversational GraphRAG Search</h2>
+        <p>Ask in English or Hinglish to query our Knowledge Graph & Pinecone vector space.</p>
+      </div>
+
+      <form id="searchForm" class="search-box">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        
+        <input 
+          type="text" 
+          id="queryInput" 
+          placeholder="e.g. Recommend movies similar to Interstellar or Nolan ki sabse acchi movie konsi hai" 
+          autocomplete="off" 
+          required 
+        />
+
+        <button type="button" id="micBtn" class="mic-btn" title="Voice Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+        </button>
+
+        <button type="submit" id="searchBtn" class="submit-btn">
+          <span>Ask AI Engine</span>
+        </button>
+      </form>
+
+      <!-- Quick Prompt Chips -->
+      <div class="quick-prompts">
+        <span class="label">Suggested AI Searches:</span>
+        <button class="prompt-chip" data-query="Recommend movies similar to Inception">Similar to Inception</button>
+        <button class="prompt-chip" data-query="Nolan ki sabse acchi movie konsi hai">Nolan Best Movies (Hinglish)</button>
+        <button class="prompt-chip" data-query="Which movies directed by Christopher Nolan won Oscars?">Nolan Oscar Winners</button>
+        <button class="prompt-chip" data-query="What movies has Leonardo DiCaprio acted in?">Leonardo DiCaprio Movies</button>
+      </div>
+    </section>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="loading-box hidden">
+      <div class="spinner"></div>
+      <p>Executing GraphRAG traversal & Pinecone vector search...</p>
+    </div>
+
+    <!-- AI Recommendation Answer Result Card -->
+    <section id="resultsSection" class="results-card hidden">
+      <div class="card-header">
+        <div class="header-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <h3>AI Recommendations & Graph Insights</h3>
+        </div>
+        <button id="copyBtn" class="copy-btn">Copy Output</button>
+      </div>
+      <div id="answerContent" class="markdown-body">
+        <!-- Rendered AI Output -->
+      </div>
+    </section>
+
+    <!-- Interactive 2D Neo4j Subgraph Card -->
+    <section id="graphSection" class="graph-card hidden">
+      <div class="card-header">
+        <div class="header-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          <h3>Interactive Subgraph Visualizer</h3>
+        </div>
+        <div class="graph-controls">
+          <button id="zoomInBtn" class="ctrl-btn">+</button>
+          <button id="zoomOutBtn" class="ctrl-btn">-</button>
+          <button id="resetFitBtn" class="ctrl-btn">Fit View</button>
+        </div>
+      </div>
+
+      <div class="graph-legend-bar">
+        <span class="legend-chip"><span class="lg-dot movie"></span> Movie</span>
+        <span class="legend-chip"><span class="lg-dot director"></span> Director</span>
+        <span class="legend-chip"><span class="lg-dot actor"></span> Actor</span>
+        <span class="legend-chip"><span class="lg-dot genre"></span> Genre</span>
+        <span class="legend-chip"><span class="lg-dot theme"></span> Theme</span>
+        <span class="legend-chip"><span class="lg-dot award"></span> Award</span>
+      </div>
+
+      <div id="graphCanvas" class="graph-canvas"></div>
+    </section>
+
+    <!-- Full Movie Streaming Catalog Section -->
+    <section class="catalog-section" id="catalogSection">
+      <div class="catalog-header">
+        <div class="section-title-box">
+          <h2>Full Movie Catalog</h2>
+          <p>Browse our Knowledge Graph dataset of legendary blockbuster films.</p>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-tabs" id="filterTabs">
+          <button class="tab-btn active" data-filter="all">All Movies</button>
+          <button class="tab-btn" data-filter="Sci-Fi">Sci-Fi</button>
+          <button class="tab-btn" data-filter="Action">Action</button>
+          <button class="tab-btn" data-filter="Drama">Drama</button>
+          <button class="tab-btn" data-filter="Crime">Crime</button>
+          <button class="tab-btn" data-filter="Oscar">Oscar Winners</button>
+        </div>
+      </div>
+
+      <!-- Movie Cards Streaming Grid -->
+      <div class="movie-grid" id="movieGrid">
+        <!-- Rendered movie cards -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>MovieGraph AI Cinema Platform • Engine powered by Neo4j Knowledge Graph, Pinecone Vector DB & Gemini 2.5 Flash</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -12,6 +12,8 @@ load_dotenv()
 # 1. NEO4J
 # =====================================================================
 NEO4J_URI = os.getenv("NEO4J_URI", "").strip()
+if "+s://" in NEO4J_URI:
+    NEO4J_URI = NEO4J_URI.replace("+s://", "+ssc://")
 NEO4J_USERNAME = os.getenv("NEO4J_USERNAME", "neo4j").strip()
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "").strip()
 
@@ -24,6 +26,7 @@ if NEO4J_URI:
         )
     except Exception as e:
         print(f"⚠️ Warning initializing Neo4j driver: {e}")
+
 
 # =====================================================================
 # 2. PINECONE
@@ -53,7 +56,8 @@ if GEMINI_API_KEY:
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
             api_key=GEMINI_API_KEY,
-            temperature=0
+            temperature=0,
+            max_retries=3
         )
         genai_client = genai.Client(api_key=GEMINI_API_KEY)
     except Exception as e:

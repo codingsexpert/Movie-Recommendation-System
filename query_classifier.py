@@ -2,10 +2,23 @@ import json
 import re
 from config import llm
 
+_CLASSIFY_CACHE = {}
+
 def classify_query(query: str, resolved_entities: dict) -> dict:
-    """Classify query intent as 'graph' or 'similarity' using resolved entity context."""
+    """Classify query intent as 'graph' or 'similarity' using resolved entity context (with caching)."""
+    q_key = query.strip().lower()
+    if q_key in _CLASSIFY_CACHE:
+        return _CLASSIFY_CACHE[q_key]
+
     entities = resolved_entities.get("entities", [])
     unresolved = resolved_entities.get("unresolved", [])
+
+    # Fast keyword check first
+    q_lower = query.lower()
+    if any(k in q_lower for k in ["similar", "recommend", "like", "jaisi", "jaisa", "suggest"]):
+        res = {"type": "similarity", "reasoning": "Keyword recommendation detection."}
+        _CLASSIFY_CACHE[q_key] = res
+        return res
 
     entity_context = (
         "\n".join([f'"{e["searchTerm"]}" is a {e["label"]} (full name: "{e["nodeName"]}")' for e in entities])
@@ -41,20 +54,39 @@ CLASSIFY the query as ONE of:
 Respond ONLY with JSON: {{"type": "graph" or "similarity", "reasoning": "one sentence"}}
 No markdown, no backticks."""
 
-    response = llm.invoke([
-        {"role": "system", "content": prompt},
-        {"role": "user", "content": query}
-    ])
-
-    raw = response.content
-    if isinstance(raw, list):
-        raw = " ".join([b.text if hasattr(b, "text") else str(b) for b in raw])
-    raw = raw.strip()
-    raw = re.sub(r"```json\s*", "", raw)
-    raw = re.sub(r"```\s*", "", raw).strip()
-
     try:
-        return json.loads(raw)
-    except Exception:
-        print("⚠️ Classification failed, defaulting to graph")
-        return {"type": "graph", "reasoning": "Default fallback"}
+        response = llm.invoke([
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": query}
+        ])
+
+        raw = response.content
+        if isinstance(raw, list):
+            raw = " ".join([b.text if hasattr(b, "text") else str(b) for b in raw])
+        raw = raw.strip()
+        raw = re.sub(r"```json\s*", "", raw)
+        raw = re.sub(r"```\s*", "", raw).strip()
+
+        # Extract JSON object using regex
+        match = re.search(r"\{.*\}", raw, re.DOTALL)
+        if match:
+            raw = match.group(0)
+
+        parsed = json.loads(raw)
+        if isinstance(parsed, dict) and "type" in parsed:
+            _CLASSIFY_CACHE[q_key] = parsed
+            return parsed
+    except Exception as err:
+        print(f"⚠️ Query classification LLM call failed ({err}), falling back to keyword classification...")
+
+    # Keyword fallback edge case handling
+    if any(k in q_lower for k in ["similar", "recommend", "like", "jaisi", "jaisa"]):
+        res = {"type": "similarity", "reasoning": "Keyword fallback detection for recommendations."}
+        _CLASSIFY_CACHE[q_key] = res
+        return res
+
+    print("⚠️ Classification failed, defaulting to graph")
+    res = {"type": "graph", "reasoning": "Default classification fallback."}
+    _CLASSIFY_CACHE[q_key] = res
+    return res
+

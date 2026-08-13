@@ -74,9 +74,21 @@ def extract_batch(file_info, start: int, end: int, attempt: int = 1) -> list[dic
         print(f"   ❌ Batch {start}-{end} FAILED after {max_retries} attempts: {err_msg[:150]}")
         return []
 
-def extract_all_entities(pdf_path: str, total_movies: int = 1000, batch_size: int = 50) -> list[dict]:
+def count_movies(file_info) -> int:
+    """Ask the model to estimate total movies in the PDF."""
+    prompt = "Read the attached document and return only a single integer representing the total number of movies listed in the document."
+    response = genai_client.models.generate_content(model="gemini-2.5-flash", contents=[file_info, prompt])
+    try:
+        return int(re.sub(r'\D', '', response.text))
+    except:
+        return 0
+
+def extract_all_entities(pdf_path: str, batch_size: int = 50) -> list[dict]:
     """Extract ALL entities from PDF using parallel batch requests."""
     file_info = upload_pdf(pdf_path)
+    
+    total_movies = count_movies(file_info)
+    print(f"   🔍 Detected {total_movies} movies in document.")
 
     total_batches = (total_movies + batch_size - 1) // batch_size
     all_batches = []
@@ -144,5 +156,6 @@ def extract_all_entities(pdf_path: str, total_movies: int = 1000, batch_size: in
     return results
 
 if __name__ == "__main__":
-    entities = extract_all_entities("./data/movies.pdf", total_movies=10, batch_size=5)
+    entities = extract_all_entities("./data/movies.pdf", batch_size=5)
     print("Extracted sample:", len(entities))
+
