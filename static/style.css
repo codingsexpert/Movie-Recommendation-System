@@ -894,302 +894,199 @@ body {
   box-shadow: 0 2px 8px var(--accent-glow);
 }
 
-/* ─── Movie Cards Grid ─── */
+/* ─── Movie Cards Grid — Netflix Poster Style ─── */
 .movie-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.35rem;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 1rem;
 }
 
-/* ─── Movie Card ─── */
+/* ─── Netflix Poster Card ─── */
 .movie-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  position: relative;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: all var(--transition-mid);
-  cursor: default;
+  aspect-ratio: 2 / 3;
+  cursor: pointer;
+  transition: transform var(--transition-mid), box-shadow var(--transition-mid);
 }
 
 .movie-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-hover);
-  border-color: rgba(37, 99, 235, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+  z-index: 10;
 }
 
-.movie-card:hover .card-poster img {
-  transform: scale(1.06);
+[data-theme="dark"] .movie-card:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
 }
 
-.movie-card:hover .poster-play-icon {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-/* ─── Card Poster ─── */
-.card-poster {
+/* Poster Image Wrapper */
+.poster-wrap {
   position: relative;
-  height: 320px;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+  border-radius: var(--radius-md);
 }
 
-[data-theme="dark"] .card-poster {
-  background: linear-gradient(135deg, #1e293b, #0f172a);
-}
-
-.card-poster img {
+.poster-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-slow);
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.poster-overlay {
+.movie-card:hover .poster-wrap img {
+  transform: scale(1.08);
+}
+
+/* Bottom Gradient Over Poster */
+.poster-gradient {
   position: absolute;
   inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 35%,
+    rgba(0, 0, 0, 0.7) 80%,
+    rgba(0, 0, 0, 0.92) 100%
+  );
   z-index: 1;
+  pointer-events: none;
   transition: background var(--transition-mid);
 }
 
-[data-theme="light"] .poster-overlay {
+.movie-card:hover .poster-gradient {
   background: linear-gradient(
     180deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.1) 40%,
-    rgba(255,255,255,0.7) 75%,
-    rgba(255,255,255,0.95) 100%
+    rgba(0, 0, 0, 0.1) 10%,
+    rgba(0, 0, 0, 0.65) 55%,
+    rgba(0, 0, 0, 0.95) 100%
   );
 }
 
-[data-theme="dark"] .poster-overlay {
-  background: linear-gradient(
-    180deg,
-    rgba(17, 24, 39, 0.05) 0%,
-    rgba(17, 24, 39, 0.5) 55%,
-    rgba(17, 24, 39, 0.92) 100%
-  );
-}
-
-/* Play icon overlay on hover */
-.poster-play-icon {
+/* Rating Badge — Top Right */
+.poster-rating {
   position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
-  z-index: 4;
-  width: 48px;
-  height: 48px;
-  background: rgba(37, 99, 235, 0.85);
-  border-radius: 50%;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 3;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--gold);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+}
+
+/* Oscar Badge — Top Left */
+.poster-oscar {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 3;
+  font-size: 0.9rem;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  transition: all var(--transition-mid);
-  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
-}
-
-.poster-play-icon svg {
-  margin-left: 3px;
-}
-
-.poster-badge-row {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 0.75rem;
-  z-index: 3;
-  gap: 0.3rem;
-}
-
-.year-badge {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: #ffffff;
-  background: rgba(0,0,0,0.35);
+  background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(6px);
-  padding: 0.18rem 0.5rem;
-  border-radius: var(--radius-xs);
-  letter-spacing: 0.3px;
+  border-radius: 50%;
 }
 
-[data-theme="light"] .year-badge {
-  background: rgba(37, 99, 235, 0.8);
-}
-
-.rating-pill {
-  font-size: 0.68rem;
-  font-weight: 700;
-  background: rgba(217, 119, 6, 0.15);
-  color: var(--gold);
-  border: 1px solid rgba(217, 119, 6, 0.25);
-  padding: 0.18rem 0.5rem;
-  border-radius: var(--radius-xs);
-  backdrop-filter: blur(6px);
-}
-
-[data-theme="light"] .rating-pill {
-  background: rgba(255,255,255,0.85);
-  border-color: rgba(217, 119, 6, 0.3);
-}
-
-.award-pill {
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: var(--gold);
-  background: rgba(217, 119, 6, 0.1);
-  border: 1px solid rgba(217, 119, 6, 0.2);
-  padding: 0.15rem 0.45rem;
-  border-radius: var(--radius-xs);
-  backdrop-filter: blur(4px);
-}
-
-[data-theme="light"] .award-pill {
-  background: rgba(255,255,255,0.85);
-}
-
-.poster-content {
+/* Info Section — Sits at Bottom of Poster */
+.poster-info {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1rem;
-  z-index: 3;
+  z-index: 2;
+  padding: 1rem 0.85rem 0.85rem;
+  transform: translateY(42px);
+  transition: transform var(--transition-mid);
 }
 
-.poster-title {
+.movie-card:hover .poster-info {
+  transform: translateY(0);
+}
+
+.poster-movie-title {
   font-family: 'Outfit', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 800;
-  color: var(--text-primary);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-}
-
-[data-theme="dark"] .poster-title {
   color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  line-height: 1.2;
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* ─── Card Body ─── */
-.card-body {
-  padding: 1rem 1.1rem 1.15rem;
-  flex: 1;
+.poster-meta {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 0.55rem;
+}
+
+/* Action Buttons Row */
+.poster-actions {
   display: flex;
-  flex-direction: column;
-  background: var(--bg-surface);
+  gap: 0.3rem;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all var(--transition-mid);
 }
 
-.card-meta-line {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-  margin-bottom: 0.4rem;
-  display: flex;
-  gap: 0.25rem;
-  line-height: 1.4;
+.movie-card:hover .poster-actions {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.card-meta-line strong {
-  color: var(--text-secondary) !important;
-  -webkit-text-fill-color: var(--text-secondary);
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.card-genres {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-bottom: 0.85rem;
-  margin-top: 0.2rem;
-}
-
-.genre-pill {
+.poster-btn {
+  border: none;
+  border-radius: var(--radius-xs);
+  padding: 0.35rem 0.55rem;
   font-size: 0.65rem;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-light);
-  padding: 0.12rem 0.45rem;
-  border-radius: 4px;
-  transition: all var(--transition-fast);
-}
-
-[data-theme="dark"] .genre-pill {
-  background: rgba(59, 130, 246, 0.12);
-}
-
-.genre-pill:hover {
-  background: var(--accent);
-  color: #ffffff;
-}
-
-/* ─── Card Actions ─── */
-.card-actions {
-  margin-top: auto;
-  display: flex;
-  gap: 0.35rem;
-}
-
-.btn-card-recommend {
-  flex: 1;
-  background: var(--accent);
-  color: #ffffff;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.55rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-card-recommend:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 3px 12px var(--accent-glow);
-}
-
-.btn-card-trailer {
-  background: var(--red);
-  color: #ffffff;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.55rem;
-  font-size: 0.72rem;
   font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+  white-space: nowrap;
 }
 
-.btn-card-trailer:hover {
+.poster-btn-primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.poster-btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.poster-btn-red {
+  background: var(--red);
+  color: #ffffff;
+}
+
+.poster-btn-red:hover {
   background: var(--red-hover);
-  box-shadow: 0 3px 12px rgba(239, 68, 68, 0.18);
 }
 
-.btn-card-graph {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.55rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition-fast);
+.poster-btn-ghost {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.btn-card-graph:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.poster-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.22);
 }
 
 /* ─── Trailer Modal ─── */
@@ -1328,17 +1225,18 @@ body {
   .spotlight-title { font-size: 1.8rem; }
   .spotlight-desc { font-size: 0.85rem; }
   .spotlight-actions { flex-direction: column; gap: 0.4rem; }
-  .movie-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
-  .card-poster { height: 260px; }
+  .movie-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+  .poster-movie-title { font-size: 0.85rem; }
+  .poster-btn { font-size: 0.6rem; padding: 0.28rem 0.4rem; }
   .catalog-header { flex-direction: column; align-items: flex-start; }
   .trailer-modal-content { width: 96%; padding: 1rem; }
 }
 
 @media (max-width: 480px) {
-  .movie-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-  .card-poster { height: 220px; }
-  .poster-title { font-size: 1rem; }
-  .card-body { padding: 0.75rem; }
+  .movie-grid { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+  .poster-movie-title { font-size: 0.75rem; }
+  .poster-info { padding: 0.6rem 0.5rem 0.5rem; }
+  .poster-actions { display: none; }
   .brand-title h1 { font-size: 1.05rem; }
 }
 

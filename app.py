@@ -105,7 +105,7 @@ FALLBACK_CATALOG = [
         "genres": ["Sci-Fi", "Action", "Thriller"],
         "themes": ["Dreams", "Reality", "Subconscious"],
         "awards": ["Oscar Winner (4 Academy Awards)"],
-        "poster": "https://image.tmdb.org/t/p/w500/oYuLE1hYm1CYjFAbVPIbDEmBwwM.jpg",
+        "poster": "https://image.tmdb.org/t/p/w500/oYuLEe1hYm1CYjFAbVPIbDEmBwwM.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w1280/8ZTVqvKDQ8emSGUEMjsS4yHAiE.jpg",
         "trailer": "https://www.youtube.com/embed/YoHD9XEInc0"
     },
@@ -128,7 +128,7 @@ FALLBACK_CATALOG = [
         "themes": ["Justice", "Chaos", "Heroism"],
         "awards": ["Oscar Winner (Heath Ledger Best Supporting Actor)"],
         "poster": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-        "backdrop": "https://image.tmdb.org/t/p/w1280/nMK2819TyQvW2guWZ5CS2hZXIw.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/nMKd2819TyQvW2guWZ5CS2hZXIw.jpg",
         "trailer": "https://www.youtube.com/embed/EXeTwQWrcwY"
     },
     {
@@ -139,7 +139,7 @@ FALLBACK_CATALOG = [
         "themes": ["Atomic Age", "Moral Dilemma", "Manhattan Project"],
         "awards": ["Oscar Winner (7 Academy Awards incl. Best Picture)"],
         "poster": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGvC271PqY.jpg",
-        "backdrop": "https://image.tmdb.org/t/p/w1280/fm6K8Ofi0Rs2R6hEGUYevjUvy20.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/fm6KI8Ofi0Rs2R6hEGUYevjUvy20.jpg",
         "trailer": "https://www.youtube.com/embed/uYPbbksJxIg"
     },
     {
@@ -149,7 +149,7 @@ FALLBACK_CATALOG = [
         "genres": ["Mystery", "Thriller", "Psychological"],
         "themes": ["Mental Asylum", "Delusion", "Guilt"],
         "awards": ["National Board of Review Winner"],
-        "poster": "https://image.tmdb.org/t/p/w500/4BgSWGIpPOmBZGFdMfwFWOf2D9Y.jpg",
+        "poster": "https://image.tmdb.org/t/p/w500/kve20tXMHFueDaWP5Dq3JnGpiJo.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w1280/w7kWbE2fXbJ4dC41sQhU9o6t0mY.jpg",
         "trailer": "https://www.youtube.com/embed/5iaYLCiq5RM"
     },
@@ -160,7 +160,7 @@ FALLBACK_CATALOG = [
         "genres": ["Sci-Fi", "Action"],
         "themes": ["Simulated Reality", "Cyberpunk", "Free Will"],
         "awards": ["Oscar Winner (4 Academy Awards)"],
-        "poster": "https://image.tmdb.org/t/p/w500/f89U3w9nYiBAbsfWivHCPOK20d8.jpg",
+        "poster": "https://image.tmdb.org/t/p/w500/f89U3ADGfhBJl6ip1pSUEqBKB0e.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w1280/5v6n6uP3lJ78vK2Cg93W55xW90d.jpg",
         "trailer": "https://www.youtube.com/embed/vKQi3bBA1y8"
     },
@@ -171,7 +171,7 @@ FALLBACK_CATALOG = [
         "genres": ["Sci-Fi", "Adventure", "Action"],
         "themes": ["Prophecy", "Desert Planet", "Empire"],
         "awards": ["Blockbuster Critical Acclaim"],
-        "poster": "https://image.tmdb.org/t/p/w500/1pdfLPoLMag8StABMwMvChg7rvi.jpg",
+        "poster": "https://image.tmdb.org/t/p/w500/1pdfLvPOLMag8StABMwMvChg7rvi.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w1280/xOM08Go8DFBhidHYxP6yA46UTv8.jpg",
         "trailer": "https://www.youtube.com/embed/Way9Dexny3w"
     },
@@ -185,6 +185,138 @@ FALLBACK_CATALOG = [
         "poster": "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w1280/suaEOtk1N1sgg2MTM7oHO2z83S5.jpg",
         "trailer": "https://www.youtube.com/embed/s7EdQ4FqbhY"
+    },
+    {
+        "title": "The Godfather", "year": 1972, "rating": 9.2,
+        "directors": ["Francis Ford Coppola"],
+        "actors": ["Marlon Brando", "Al Pacino", "James Caan"],
+        "genres": ["Crime", "Drama"],
+        "themes": ["Family", "Power", "Loyalty"],
+        "awards": ["Oscar Winner (Best Picture)"],
+        "poster": "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/tmU7GeKVybMWFButWEGl2M4GeiP.jpg",
+        "trailer": "https://www.youtube.com/embed/UaVTIH8mujA"
+    },
+    {
+        "title": "Fight Club", "year": 1999, "rating": 8.8,
+        "directors": ["David Fincher"],
+        "actors": ["Brad Pitt", "Edward Norton", "Helena Bonham Carter"],
+        "genres": ["Drama", "Thriller"],
+        "themes": ["Identity", "Consumerism", "Anarchy"],
+        "awards": ["Empire Award Winner"],
+        "poster": "https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/hZkgoQYus5dXo3H8T7Uef6DNknx.jpg",
+        "trailer": "https://www.youtube.com/embed/qtRKdVHc-cE"
+    },
+    {
+        "title": "Forrest Gump", "year": 1994, "rating": 8.8,
+        "directors": ["Robert Zemeckis"],
+        "actors": ["Tom Hanks", "Robin Wright", "Gary Sinise"],
+        "genres": ["Drama", "Romance"],
+        "themes": ["Destiny", "American History", "Love"],
+        "awards": ["Oscar Winner (6 Academy Awards incl. Best Picture)"],
+        "poster": "https://image.tmdb.org/t/p/w500/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/7c9UVPPiTPltouxRVY6N9uugaVA.jpg",
+        "trailer": "https://www.youtube.com/embed/bLvqoHBptjg"
+    },
+    {
+        "title": "The Shawshank Redemption", "year": 1994, "rating": 9.3,
+        "directors": ["Frank Darabont"],
+        "actors": ["Tim Robbins", "Morgan Freeman"],
+        "genres": ["Drama"],
+        "themes": ["Hope", "Freedom", "Injustice"],
+        "awards": ["7 Oscar Nominations"],
+        "poster": "https://image.tmdb.org/t/p/w500/9cjIGJaKPHQKactAF6m14FWMIOL.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/kXfqcdQKsToO0OUXHcrrNCHDBzO.jpg",
+        "trailer": "https://www.youtube.com/embed/PLl99DlL6b4"
+    },
+    {
+        "title": "Gladiator", "year": 2000, "rating": 8.5,
+        "directors": ["Ridley Scott"],
+        "actors": ["Russell Crowe", "Joaquin Phoenix", "Connie Nielsen"],
+        "genres": ["Action", "Drama", "Adventure"],
+        "themes": ["Revenge", "Honor", "Roman Empire"],
+        "awards": ["Oscar Winner (Best Picture)"],
+        "poster": "https://image.tmdb.org/t/p/w500/ty8TGRuvJLPUmAR1H1nRIsgwSmL.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/Ar7QuEEQMFDMemjH6Y91LadKnvb.jpg",
+        "trailer": "https://www.youtube.com/embed/owK1qxDselE"
+    },
+    {
+        "title": "Avengers: Endgame", "year": 2019, "rating": 8.4,
+        "directors": ["Anthony Russo", "Joe Russo"],
+        "actors": ["Robert Downey Jr.", "Chris Evans", "Scarlett Johansson"],
+        "genres": ["Action", "Sci-Fi", "Adventure"],
+        "themes": ["Sacrifice", "Time Travel", "Unity"],
+        "awards": ["People's Choice Award Winner"],
+        "poster": "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9PBPE3UyOJ.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg",
+        "trailer": "https://www.youtube.com/embed/TcMBFSGVi1c"
+    },
+    {
+        "title": "Joker", "year": 2019, "rating": 8.4,
+        "directors": ["Todd Phillips"],
+        "actors": ["Joaquin Phoenix", "Robert De Niro", "Zazie Beetz"],
+        "genres": ["Crime", "Drama", "Thriller"],
+        "themes": ["Mental Illness", "Society", "Chaos"],
+        "awards": ["Oscar Winner (Best Actor)"],
+        "poster": "https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/n6bUvigpRFqSwmPp1m2YMDNq3Fg.jpg",
+        "trailer": "https://www.youtube.com/embed/zAGVQLHvwOY"
+    },
+    {
+        "title": "Parasite", "year": 2019, "rating": 8.5,
+        "directors": ["Bong Joon-ho"],
+        "actors": ["Song Kang-ho", "Lee Sun-kyun", "Cho Yeo-jeong"],
+        "genres": ["Drama", "Thriller", "Comedy"],
+        "themes": ["Class Divide", "Greed", "Social Commentary"],
+        "awards": ["Oscar Winner (Best Picture — first non-English)"],
+        "poster": "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/TU9NIjwzjoKPwQHoHshkFcQUCG8.jpg",
+        "trailer": "https://www.youtube.com/embed/5xH0HfJHsaY"
+    },
+    {
+        "title": "Spider-Man: Across the Spider-Verse", "year": 2023, "rating": 8.7,
+        "directors": ["Joaquim Dos Santos", "Kemp Powers"],
+        "actors": ["Shameik Moore", "Hailee Steinfeld", "Oscar Isaac"],
+        "genres": ["Animation", "Action", "Adventure"],
+        "themes": ["Multiverse", "Identity", "Responsibility"],
+        "awards": ["Annie Award Winner"],
+        "poster": "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/4HodYYKEIsGOdinkGi2Ucz6X9i0.jpg",
+        "trailer": "https://www.youtube.com/embed/cqGjhVJWtEg"
+    },
+    {
+        "title": "The Batman", "year": 2022, "rating": 7.8,
+        "directors": ["Matt Reeves"],
+        "actors": ["Robert Pattinson", "Zoë Kravitz", "Paul Dano", "Colin Farrell"],
+        "genres": ["Action", "Crime", "Drama"],
+        "themes": ["Vengeance", "Corruption", "Fear"],
+        "awards": ["Saturn Award Winner"],
+        "poster": "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/b0PlSFdDwbyFAJlMR1oAiVSBIwI.jpg",
+        "trailer": "https://www.youtube.com/embed/mqqft2x_Aa4"
+    },
+    {
+        "title": "John Wick: Chapter 4", "year": 2023, "rating": 7.7,
+        "directors": ["Chad Stahelski"],
+        "actors": ["Keanu Reeves", "Donnie Yen", "Bill Skarsgård"],
+        "genres": ["Action", "Thriller", "Crime"],
+        "themes": ["Survival", "Honor", "Brotherhood"],
+        "awards": ["Critics Choice Nomination"],
+        "poster": "https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VKB5dH9FmmC.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/7I6VUdPj6tQECNHdviJkUHD2u89.jpg",
+        "trailer": "https://www.youtube.com/embed/qEVUtrk8_B4"
+    },
+    {
+        "title": "Everything Everywhere All at Once", "year": 2022, "rating": 8.0,
+        "directors": ["Daniel Kwan", "Daniel Scheinert"],
+        "actors": ["Michelle Yeoh", "Ke Huy Quan", "Stephanie Hsu"],
+        "genres": ["Action", "Sci-Fi", "Comedy"],
+        "themes": ["Multiverse", "Family", "Existentialism"],
+        "awards": ["Oscar Winner (7 Academy Awards incl. Best Picture)"],
+        "poster": "https://image.tmdb.org/t/p/w500/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/fWdPrsNzp9FTkPWwP3yjYxnbDvL.jpg",
+        "trailer": "https://www.youtube.com/embed/wxN1T1qdQ0I"
     }
 ]
 
