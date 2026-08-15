@@ -874,14 +874,37 @@ body.light-theme .glow-orb,
 
 /* ─── Markdown Output ─── */
 .markdown-body {
-  font-size: 0.95rem;
+  font-size: 0.96rem;
   line-height: 1.75;
   color: var(--text-secondary);
 }
 
-.markdown-body p { margin-bottom: 0.9rem; }
-.markdown-body ul, .markdown-body ol { margin-left: 1.5rem; margin-bottom: 0.9rem; }
-.markdown-body strong { color: var(--accent); font-weight: 700; }
+.markdown-body p { margin-bottom: 0.95rem; }
+
+.markdown-body ul, .markdown-body ol {
+  margin-left: 1.25rem;
+  margin-bottom: 1.1rem;
+  padding-left: 0.4rem;
+}
+
+.markdown-body li {
+  margin-bottom: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.markdown-body li::marker {
+  color: var(--accent);
+  font-weight: 800;
+  font-family: 'Outfit', sans-serif;
+}
+
+.markdown-body strong {
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+}
+
 .markdown-body code {
   background: var(--bg-elevated);
   padding: 0.12rem 0.4rem;

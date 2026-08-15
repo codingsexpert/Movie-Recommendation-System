@@ -444,69 +444,56 @@ document.addEventListener('DOMContentLoaded', () => {
     element.innerHTML = '';
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
-    
-    const nodes = [];
-    function collectNodes(node) {
+
+    const queue = [];
+
+    function buildQueue(node, parentRef) {
       if (node.nodeType === Node.TEXT_NODE) {
-        if (node.nodeValue.trim()) {
-          nodes.push({ type: 'text', parent: node.parentNode, value: node.nodeValue, node: node });
+        const text = node.nodeValue;
+        if (text) {
+          for (let i = 0; i < text.length; i++) {
+            queue.push({ type: 'char', char: text[i], parentRef: parentRef });
+          }
         }
-      } else {
-        const clone = node.cloneNode(false);
-        node.targetClone = clone;
-        
-        const parentClone = node.parentNode && node.parentNode.targetClone;
-        if (parentClone) {
-          parentClone.appendChild(clone);
-        } else {
-          element.appendChild(clone);
-        }
-        
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        queue.push({ type: 'start_element', node: node, parentRef: parentRef });
         for (let child of node.childNodes) {
-          collectNodes(child);
+          buildQueue(child, node);
         }
+        queue.push({ type: 'end_element', node: node });
       }
     }
-    
+
     for (let child of tempDiv.childNodes) {
-      collectNodes(child);
+      buildQueue(child, null);
     }
-    
-    nodes.forEach(n => {
-      n.node.nodeValue = ''; // Clear text
-    });
-    
-    let nodeIndex = 0;
-    let charIndex = 0;
-    
-    function typeNext() {
-      if (nodeIndex >= nodes.length) {
+
+    let index = 0;
+
+    function step() {
+      if (index >= queue.length) {
         if (callback) callback();
         return;
       }
-      
-      const currentNode = nodes[nodeIndex];
-      const targetParent = currentNode.parent.targetClone || element;
-      
-      let textNode = currentNode.targetTextNode;
-      if (!textNode) {
-        textNode = document.createTextNode('');
-        targetParent.appendChild(textNode);
-        currentNode.targetTextNode = textNode;
-      }
-      
-      if (charIndex < currentNode.value.length) {
-        textNode.nodeValue += currentNode.value[charIndex];
-        charIndex++;
-        setTimeout(typeNext, speed);
-      } else {
-        nodeIndex++;
-        charIndex = 0;
-        setTimeout(typeNext, speed);
+
+      const item = queue[index++];
+
+      if (item.type === 'start_element') {
+        const clone = item.node.cloneNode(false);
+        item.node.targetClone = clone;
+        const parentTarget = item.parentRef && item.parentRef.targetClone ? item.parentRef.targetClone : element;
+        parentTarget.appendChild(clone);
+        step();
+      } else if (item.type === 'end_element') {
+        step();
+      } else if (item.type === 'char') {
+        const parentTarget = item.parentRef && item.parentRef.targetClone ? item.parentRef.targetClone : element;
+        parentTarget.appendChild(document.createTextNode(item.char));
+        setTimeout(step, speed);
       }
     }
-    
-    typeNext();
+
+    step();
   }
 
   // ─── Recommendation Cards Grid ───
