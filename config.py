@@ -20,12 +20,17 @@ NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "").strip()
 driver = None
 if NEO4J_URI:
     try:
-        driver = GraphDatabase.driver(
+        temp_driver = GraphDatabase.driver(
             NEO4J_URI,
-            auth=(NEO4J_USERNAME, NEO4J_PASSWORD)
+            auth=(NEO4J_USERNAME, NEO4J_PASSWORD),
+            connection_timeout=2.0
         )
+        temp_driver.verify_connectivity()
+        driver = temp_driver
+        print("✅ Neo4j: Connected and verified connectivity!")
     except Exception as e:
-        print(f"⚠️ Warning initializing Neo4j driver: {e}")
+        print(f"⚠️ Warning initializing Neo4j driver (using fallback vector/similarity mode): {e}")
+        driver = None
 
 
 # =====================================================================
@@ -57,7 +62,7 @@ if GEMINI_API_KEY:
             model="gemini-2.5-flash",
             api_key=GEMINI_API_KEY,
             temperature=0,
-            max_retries=3
+            max_retries=0
         )
         genai_client = genai.Client(api_key=GEMINI_API_KEY)
     except Exception as e:

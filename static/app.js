@@ -2,14 +2,40 @@
 // MovieGraph AI — Netflix-Style Cinematic Platform Engine v3.0
 // ═══════════════════════════════════════════════════════════════════════
 
+window.handleImageLoadError = function(img, title) {
+  const wrap = img.parentNode;
+  if (!wrap) return;
+  img.remove();
+  
+  // Create beautiful fallback element
+  const placeholder = document.createElement('div');
+  placeholder.className = 'placeholder-poster-gradient';
+  placeholder.style.width = '100%';
+  placeholder.style.height = '100%';
+  placeholder.style.background = 'linear-gradient(135deg, #1e293b, #0b0f1a)';
+  placeholder.style.display = 'flex';
+  placeholder.style.flexDirection = 'column';
+  placeholder.style.alignItems = 'center';
+  placeholder.style.justifyContent = 'center';
+  placeholder.style.padding = '1.5rem';
+  placeholder.style.textAlign = 'center';
+  placeholder.style.border = '1px solid var(--border)';
+  placeholder.innerHTML = `
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px; filter: drop-shadow(0 2px 8px var(--accent-glow));"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"></path></svg>
+    <span style="font-family:'Outfit', sans-serif; font-size:1.05rem; font-weight:800; color:#ffffff; line-height:1.3; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; text-shadow:0 2px 4px rgba(0,0,0,0.5);">${title}</span>
+  `;
+  wrap.insertBefore(placeholder, wrap.firstChild);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // ─── DOM References ───
-  const searchForm       = document.getElementById('searchForm');
-  const queryInput       = document.getElementById('queryInput');
-  const searchBtn        = document.getElementById('searchBtn');
-  const micBtn           = document.getElementById('micBtn');
-  const promptChips      = document.querySelectorAll('.prompt-chip');
+  const searchForm          = document.getElementById('searchForm');
+  const queryInput          = document.getElementById('queryInput');
+  const searchBtn           = document.getElementById('searchBtn');
+  const micBtn              = document.getElementById('micBtn');
+  const promptChips         = document.querySelectorAll('.prompt-chip');
+  const suggestionsDropdown = document.getElementById('suggestionsDropdown');
 
   const loadingIndicator = document.getElementById('loadingIndicator');
   const resultsSection   = document.getElementById('resultsSection');
@@ -36,6 +62,78 @@ document.addEventListener('DOMContentLoaded', () => {
   const spotlightDirector = document.getElementById('spotlightDirector');
   const spotlightDesc     = document.getElementById('spotlightDesc');
   const spotlightRating   = document.getElementById('spotlightRating');
+
+  // ─── Autocomplete suggestions logic ───
+  queryInput.addEventListener('input', () => {
+    const val = queryInput.value;
+    if (!val || val.length < 2) {
+      suggestionsDropdown.classList.add('hidden');
+      return;
+    }
+
+    const searchTerm = getAutocompleteSearchTerm(val);
+    if (!searchTerm || searchTerm.length < 2) {
+      suggestionsDropdown.classList.add('hidden');
+      return;
+    }
+
+    // Filter movie titles in allCatalogMovies containing the search term
+    const matches = allCatalogMovies.filter(m => 
+      m.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (matches.length === 0) {
+      suggestionsDropdown.classList.add('hidden');
+      return;
+    }
+
+    // Render matches
+    suggestionsDropdown.innerHTML = '';
+    suggestionsDropdown.classList.remove('hidden');
+
+    matches.slice(0, 6).forEach(movie => {
+      const div = document.createElement('div');
+      div.className = 'suggestion-item';
+      div.innerHTML = `
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span>${movie.title}</span>
+      `;
+      div.addEventListener('click', () => {
+        // Replace matching search term with the selected movie title
+        const originalVal = queryInput.value;
+        const lastIdx = originalVal.toLowerCase().lastIndexOf(searchTerm.toLowerCase());
+        
+        if (lastIdx !== -1) {
+          queryInput.value = originalVal.substring(0, lastIdx) + movie.title + originalVal.substring(lastIdx + searchTerm.length);
+        } else {
+          queryInput.value = movie.title;
+        }
+        
+        suggestionsDropdown.classList.add('hidden');
+        queryInput.focus();
+      });
+      suggestionsDropdown.appendChild(div);
+    });
+  });
+
+  // Hide dropdown on click outside
+  document.addEventListener('click', (e) => {
+    if (!queryInput.contains(e.target) && !suggestionsDropdown.contains(e.target)) {
+      suggestionsDropdown.classList.add('hidden');
+    }
+  });
+
+  function getAutocompleteSearchTerm(inputText) {
+    const text = inputText.toLowerCase();
+    const keywords = ["similar to", "like", "about", "by", "explore", "jaisi", "jaisa"];
+    for (const kw of keywords) {
+      const idx = text.lastIndexOf(kw);
+      if (idx !== -1) {
+        return inputText.substring(idx + kw.length).trim();
+      }
+    }
+    return inputText.trim();
+  }
 
   let allCatalogMovies    = [];
   let visNetworkInstance  = null;
@@ -120,7 +218,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (spotlightTitle)    spotlightTitle.textContent    = movie.title || '';
       if (spotlightYear)     spotlightYear.textContent     = movie.year || '';
       if (spotlightDirector) spotlightDirector.textContent = movie.directors ? movie.directors[0] : '';
-      if (spotlightRating)   spotlightRating.textContent   = movie.rating ? `⭐ ${movie.rating}` : '';
+      if (spotlightRating) {
+        if (movie.rating) {
+          spotlightRating.innerHTML = `<svg class="icon-star" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>${movie.rating}`;
+        } else {
+          spotlightRating.innerHTML = '';
+        }
+      }
       if (spotlightDesc) {
         const actors = (movie.actors || []).slice(0, 3).join(', ');
         const genres = (movie.genres || []).join(' · ');
@@ -177,18 +281,18 @@ document.addEventListener('DOMContentLoaded', () => {
       card.className = 'movie-card';
 
       const posterUrl = movie.poster || 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg';
-      const ratingText = movie.rating ? `⭐ ${movie.rating}` : '';
+      const ratingText = movie.rating ? `<svg class="icon-star" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -1px; margin-right: 3px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>${movie.rating}` : '';
       const hasOscar = movie.awards && movie.awards.some(a => a.toLowerCase().includes('oscar'));
       const genresText = (movie.genres || []).slice(0, 3).join(' · ');
       const yearText = movie.year || '';
 
       card.innerHTML = `
         <div class="poster-wrap">
-          <img src="${posterUrl}" alt="${movie.title}" loading="lazy" />
+          <img src="${posterUrl}" alt="${movie.title}" loading="lazy" onerror="handleImageLoadError(this, '${movie.title.replace(/'/g, "\\'")}')" />
           <div class="poster-gradient"></div>
 
           ${ratingText ? `<div class="poster-rating">${ratingText}</div>` : ''}
-          ${hasOscar ? '<div class="poster-oscar">🏆</div>' : ''}
+          ${hasOscar ? `<div class="poster-oscar" title="Oscar Winner"><svg class="icon-trophy" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 0-6 6v3.5c0 1.66 1.34 3 3 3h6c1.66 0 3-1.34 3-3V8a6 6 0 0 0-6-6z"></path></svg></div>` : ''}
 
           <div class="poster-info">
             <h3 class="poster-movie-title">${movie.title}</h3>
@@ -199,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 Similar
               </button>
               <button class="poster-btn poster-btn-red" data-action="trailer" data-title="${movie.title}">
-                ▶ Trailer
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 2px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>Trailer
               </button>
               <button class="poster-btn poster-btn-ghost" data-action="graph" data-title="${movie.title}">
                 Graph
@@ -298,6 +402,8 @@ document.addEventListener('DOMContentLoaded', () => {
   async function executeSearch(query) {
     resultsSection.classList.add('hidden');
     graphSection.classList.add('hidden');
+    const recGrid = document.getElementById('recommendedMoviesGrid');
+    if (recGrid) recGrid.style.display = 'none';
     loadingIndicator.classList.remove('hidden');
     searchBtn.disabled = true;
     const s = searchBtn.querySelector('span');
@@ -310,7 +416,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await response.json();
       loadingIndicator.classList.add('hidden');
       resultsSection.classList.remove('hidden');
-      answerContent.innerHTML = window.marked ? marked.parse(data.answer) : data.answer;
+      const htmlContent = window.marked ? marked.parse(data.answer) : data.answer;
+      const extractedTitles = extractMovieTitles(data.answer);
+      
+      // Animate HTML typing like YouTube/ChatGPT
+      typeHtml(answerContent, htmlContent, 8, () => {
+        // Once typing finishes, render the matching movie cards below it
+        renderRecommendedMovies(extractedTitles);
+      });
+
       const entities = data.resolved ? data.resolved.entities || [] : [];
       if (entities.length > 0) renderGraphCanvas(entities[0].nodeName);
       resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -325,6 +439,197 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // ─── HTML Typewriter Streamer (YouTube/ChatGPT Style) ───
+  function typeHtml(element, html, speed = 8, callback = null) {
+    element.innerHTML = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    const nodes = [];
+    function collectNodes(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        if (node.nodeValue.trim()) {
+          nodes.push({ type: 'text', parent: node.parentNode, value: node.nodeValue, node: node });
+        }
+      } else {
+        const clone = node.cloneNode(false);
+        node.targetClone = clone;
+        
+        const parentClone = node.parentNode && node.parentNode.targetClone;
+        if (parentClone) {
+          parentClone.appendChild(clone);
+        } else {
+          element.appendChild(clone);
+        }
+        
+        for (let child of node.childNodes) {
+          collectNodes(child);
+        }
+      }
+    }
+    
+    for (let child of tempDiv.childNodes) {
+      collectNodes(child);
+    }
+    
+    nodes.forEach(n => {
+      n.node.nodeValue = ''; // Clear text
+    });
+    
+    let nodeIndex = 0;
+    let charIndex = 0;
+    
+    function typeNext() {
+      if (nodeIndex >= nodes.length) {
+        if (callback) callback();
+        return;
+      }
+      
+      const currentNode = nodes[nodeIndex];
+      const targetParent = currentNode.parent.targetClone || element;
+      
+      let textNode = currentNode.targetTextNode;
+      if (!textNode) {
+        textNode = document.createTextNode('');
+        targetParent.appendChild(textNode);
+        currentNode.targetTextNode = textNode;
+      }
+      
+      if (charIndex < currentNode.value.length) {
+        textNode.nodeValue += currentNode.value[charIndex];
+        charIndex++;
+        setTimeout(typeNext, speed);
+      } else {
+        nodeIndex++;
+        charIndex = 0;
+        setTimeout(typeNext, speed);
+      }
+    }
+    
+    typeNext();
+  }
+
+  // ─── Recommendation Cards Grid ───
+  function extractMovieTitles(markdownText) {
+    const titles = [];
+    if (!markdownText) return titles;
+    // Match patterns like "1. **Inception**" or "1. **The Matrix**:" or "- **RRR**"
+    const regex = /(?:\d+\.|\*|-)\s+\*\*([^*]+)\*\*/g;
+    let match;
+    while ((match = regex.exec(markdownText)) !== null) {
+      titles.push(match[1].trim());
+    }
+    return titles;
+  }
+
+  function renderRecommendedMovies(titles) {
+    const recGrid = document.getElementById('recommendedMoviesGrid');
+    if (!recGrid) return;
+    recGrid.innerHTML = '';
+    
+    if (!titles || titles.length === 0) {
+      recGrid.style.display = 'none';
+      return;
+    }
+    
+    recGrid.style.display = 'grid';
+    
+    // Find matching movies in allCatalogMovies (case-insensitive lookup)
+    const matchedMovies = [];
+    titles.forEach(title => {
+      const movie = allCatalogMovies.find(m => m.title.toLowerCase().trim() === title.toLowerCase().trim());
+      if (movie) {
+        matchedMovies.push(movie);
+      } else {
+        // Fallback placeholder card if the movie is not in allCatalogMovies
+        matchedMovies.push({
+          title: title,
+          year: '',
+          rating: '',
+          isPlaceholder: true,
+          genres: ['Recommendation'],
+          trailer: null
+        });
+      }
+    });
+
+    matchedMovies.forEach((movie) => {
+      const card = document.createElement('div');
+      card.className = 'movie-card';
+
+      const ratingText = movie.rating ? `<svg class="icon-star" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -1px; margin-right: 3px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>${movie.rating}` : '';
+      const hasOscar = movie.awards && movie.awards.some(a => a.toLowerCase().includes('oscar'));
+      const genresText = (movie.genres || []).slice(0, 3).join(' · ');
+      const yearText = movie.year || '';
+
+      let posterHtml = '';
+      if (movie.isPlaceholder) {
+        posterHtml = `
+          <div class="placeholder-poster-gradient" style="width:100%; height:100%; background: linear-gradient(135deg, #1e293b, #0b0f1a); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; text-align:center; border: 1px solid var(--border);">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px; filter: drop-shadow(0 2px 8px var(--accent-glow));"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"></path></svg>
+            <span style="font-family:'Outfit', sans-serif; font-size:1.05rem; font-weight:800; color:#ffffff; line-height:1.3; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; text-shadow:0 2px 4px rgba(0,0,0,0.5);">${movie.title}</span>
+          </div>
+        `;
+      } else {
+        const posterUrl = movie.poster || 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg';
+        const escapedTitle = movie.title.replace(/'/g, "\\'");
+        posterHtml = `<img src="${posterUrl}" alt="${movie.title}" loading="lazy" onerror="handleImageLoadError(this, '${escapedTitle}')" />`;
+      }
+
+      card.innerHTML = `
+        <div class="poster-wrap">
+          ${posterHtml}
+          <div class="poster-gradient"></div>
+
+          ${ratingText ? `<div class="poster-rating">${ratingText}</div>` : ''}
+          ${hasOscar ? `<div class="poster-oscar" title="Oscar Winner"><svg class="icon-trophy" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 0-6 6v3.5c0 1.66 1.34 3 3 3h6c1.66 0 3-1.34 3-3V8a6 6 0 0 0-6-6z"></path></svg></div>` : ''}
+
+          <div class="poster-info">
+            <h3 class="poster-movie-title">${movie.title}</h3>
+            <div class="poster-meta">${yearText}${yearText && genresText ? ' · ' : ''}${genresText}</div>
+            <div class="poster-actions">
+              <button class="poster-btn poster-btn-primary" data-action="recommend" data-title="${movie.title}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Similar
+              </button>
+              ${movie.trailer ? `
+              <button class="poster-btn poster-btn-red" data-action="trailer" data-title="${movie.title}">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 2px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>Trailer
+              </button>
+              ` : ''}
+              <button class="poster-btn poster-btn-ghost" data-action="graph" data-title="${movie.title}">
+                Graph
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Click Event Handlers
+      card.querySelector('[data-action="recommend"]').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const q = `Recommend movies similar to ${movie.title}`;
+        queryInput.value = q;
+        executeSearch(q);
+      });
+
+      if (movie.trailer) {
+        card.querySelector('[data-action="trailer"]').addEventListener('click', (e) => {
+          e.stopPropagation();
+          openTrailer(movie.title, movie.trailer);
+        });
+      }
+
+      card.querySelector('[data-action="graph"]').addEventListener('click', (e) => {
+        e.stopPropagation();
+        renderGraphCanvas(movie.title);
+        graphSection.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      recGrid.appendChild(card);
+    });
+  }
+
   // ─── Graph Renderer ───
   async function renderGraphCanvas(entityName) {
     try {
@@ -335,7 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
       graphSection.classList.remove('hidden');
       const cm = { Movie: {background:'#2563eb',border:'#1d4ed8'}, Director: {background:'#7c3aed',border:'#5b21b6'}, Actor: {background:'#db2777',border:'#be185d'}, Genre: {background:'#059669',border:'#047857'}, Theme: {background:'#0891b2',border:'#0e7490'}, Award: {background:'#d97706',border:'#b45309'} };
       const dk = currentTheme === 'dark';
-      const nodes = new vis.DataSet(gd.nodes.map(n => ({ id:n.id, label:n.label, group:n.group||'Movie', shape:'dot', size:n.group==='Movie'?26:17, borderWidth:2, color:cm[n.group]||cm.Movie, font:{color:dk?'#f1f5f9':'#0f172a',size:12,face:'Inter',bold:true,strokeWidth:3,strokeColor:dk?'#0b0f1a':'#ffffff'}, shadow:{enabled:true,color:'rgba(0,0,0,0.15)',size:6,x:0,y:3} })));
+      const nodes = new vis.DataSet(gd.nodes.map(n => ({ id:n.id, label:n.label, group:n.group||'Movie', shape:'dot', size:n.group==='Movie'?26:17, borderWidth:2, color:cm[n.group]||cm.Movie, font:{color:dk?'#f1f5f9':'#0f172a',size:12,face:'Poppins',bold:true,strokeWidth:3,strokeColor:dk?'#0b0f1a':'#ffffff'}, shadow:{enabled:true,color:'rgba(0,0,0,0.15)',size:6,x:0,y:3} })));
       const edges = new vis.DataSet(gd.edges.map(e => ({ from:e.from, to:e.to, label:e.label, color:{color:dk?'rgba(148,163,184,0.2)':'rgba(100,116,139,0.2)',highlight:'#2563eb'}, width:1.5, smooth:{type:'continuous',roundness:0.2}, font:{size:9,align:'middle',color:dk?'rgba(203,213,225,0.6)':'#475569',strokeWidth:2,strokeColor:dk?'#0b0f1a':'#ffffff'}, arrows:{to:{enabled:true,scaleFactor:0.5}} })));
       visNetworkInstance = new vis.Network(document.getElementById('graphCanvas'), {nodes,edges}, { physics:{solver:'forceAtlas2Based',forceAtlas2Based:{gravitationalConstant:-45,centralGravity:0.008,springLength:130,springConstant:0.07,damping:0.4},stabilization:{iterations:180}}, interaction:{hover:true,zoomView:true,dragNodes:true} });
     } catch(e) { console.warn('Graph error:', e); }

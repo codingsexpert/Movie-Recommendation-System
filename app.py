@@ -56,34 +56,37 @@ def get_stats():
         }
     }
 
-    try:
-        with driver.session() as session:
-            nodes_res = session.run("""
-                MATCH (n)
-                RETURN labels(n)[0] AS label, count(n) AS cnt
-            """)
-            for record in nodes_res:
-                lbl = record["label"]
-                cnt = record["cnt"]
-                if lbl == "Movie":
-                    stats["neo4j"]["movies"] = cnt
-                elif lbl == "Director":
-                    stats["neo4j"]["directors"] = cnt
-                elif lbl == "Actor":
-                    stats["neo4j"]["actors"] = cnt
-                elif lbl == "Genre":
-                    stats["neo4j"]["genres"] = cnt
-                elif lbl == "Theme":
-                    stats["neo4j"]["themes"] = cnt
-                elif lbl == "Award":
-                    stats["neo4j"]["awards"] = cnt
+    if not driver:
+        stats["neo4j"]["status"] = "offline (fallback mode)"
+    else:
+        try:
+            with driver.session() as session:
+                nodes_res = session.run("""
+                    MATCH (n)
+                    RETURN labels(n)[0] AS label, count(n) AS cnt
+                """)
+                for record in nodes_res:
+                    lbl = record["label"]
+                    cnt = record["cnt"]
+                    if lbl == "Movie":
+                        stats["neo4j"]["movies"] = cnt
+                    elif lbl == "Director":
+                        stats["neo4j"]["directors"] = cnt
+                    elif lbl == "Actor":
+                        stats["neo4j"]["actors"] = cnt
+                    elif lbl == "Genre":
+                        stats["neo4j"]["genres"] = cnt
+                    elif lbl == "Theme":
+                        stats["neo4j"]["themes"] = cnt
+                    elif lbl == "Award":
+                        stats["neo4j"]["awards"] = cnt
 
-            total_n = session.run("MATCH (n) RETURN count(n) AS cnt").single()["cnt"]
-            total_r = session.run("MATCH ()-[r]->() RETURN count(r) AS cnt").single()["cnt"]
-            stats["neo4j"]["total_nodes"] = total_n
-            stats["neo4j"]["total_relationships"] = total_r
-    except Exception as e:
-        stats["neo4j"]["status"] = f"error: {str(e)}"
+                total_n = session.run("MATCH (n) RETURN count(n) AS cnt").single()["cnt"]
+                total_r = session.run("MATCH ()-[r]->() RETURN count(r) AS cnt").single()["cnt"]
+                stats["neo4j"]["total_nodes"] = total_n
+                stats["neo4j"]["total_relationships"] = total_r
+        except Exception as e:
+            stats["neo4j"]["status"] = f"error: {str(e)}"
 
     try:
         if pinecone_index:
@@ -510,9 +513,9 @@ def process_movie_quiz(req: QuizRequest):
     except Exception as e:
         err_msg = str(e)
         if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg:
-            user_answer = "⚠️ **API Rate Limit Exceeded**: Gemini LLM free tier quota reached for the minute. Please wait 10-15 seconds and try again."
+            user_answer = "**[Warning]** **API Rate Limit Exceeded**: Gemini LLM free tier quota reached for the minute. Please wait 10-15 seconds and try again."
         else:
-            user_answer = f"⚠️ Could not generate quiz match: {err_msg}"
+            user_answer = f"**[Error]** Could not generate quiz match: {err_msg}"
         return {
             "quiz_params": {"mood": req.mood, "genre": req.genre, "era": req.era},
             "recommendation": user_answer
@@ -568,9 +571,9 @@ def process_rag_query(req: QueryRequest):
     except Exception as e:
         err_msg = str(e)
         if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg:
-            user_answer = "⚠️ **API Rate Limit Exceeded**: Gemini LLM free tier quota reached for the minute. Please wait 10-15 seconds and click **Execute Query** again."
+            user_answer = "**[Warning]** **API Rate Limit Exceeded**: Gemini LLM free tier quota reached for the minute. Please wait 10-15 seconds and click **Execute Query** again."
         else:
-            user_answer = f"⚠️ An error occurred processing your request: {err_msg}"
+            user_answer = f"**[Error]** An error occurred processing your request: {err_msg}"
 
         return {
             "query": query,

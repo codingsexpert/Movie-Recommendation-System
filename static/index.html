@@ -6,10 +6,10 @@
   <title>MovieGraph AI — Intelligent Cinema Discovery & Recommendation Platform</title>
   <meta name="description" content="AI-powered movie recommendation engine using Knowledge Graphs, Vector Search, and Large Language Models to deliver Netflix-quality cinematic discovery.">
 
-  <!-- Google Fonts: Inter & Outfit -->
+  <!-- Google Fonts: Poppins & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
   <!-- Marked parser for rendering markdown answers -->
@@ -17,15 +17,24 @@
   <!-- Vis.js for 2D Interactive Neo4j Subgraph Canvas -->
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+  <!-- Favicon: Clapperboard SVG -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='2' width='20' height='20' rx='2.18' ry='2.18'></rect><path d='M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5'></path></svg>">
 </head>
 <body>
 
-  <!-- Background Ambient Glow Effects -->
-  <div class="ambient-glow glow-1"></div>
-  <div class="ambient-glow glow-2"></div>
-  <div class="ambient-glow glow-3"></div>
+  <!-- Dynamic 10-Color Ambient Glow Background -->
+  <div class="ambient-glow-bg">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+    <div class="glow-orb orb-4"></div>
+    <div class="glow-orb orb-5"></div>
+    <div class="glow-orb orb-6"></div>
+    <div class="glow-orb orb-7"></div>
+    <div class="glow-orb orb-8"></div>
+    <div class="glow-orb orb-9"></div>
+    <div class="glow-orb orb-10"></div>
+  </div>
 
   <!-- ═══════════ Glassmorphic Cinema Navbar ═══════════ -->
   <header class="navbar">
@@ -102,8 +111,8 @@
         <span class="meta-divider"></span>
         <span class="meta-genre">Sci-Fi • Action • Thriller</span>
         <span class="meta-divider"></span>
-        <span class="meta-award">🏆 Oscar Winner</span>
-        <span class="spotlight-rating" id="spotlightRating">⭐ 8.8</span>
+        <span class="meta-award"><svg class="icon-trophy" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 0-6 6v3.5c0 1.66 1.34 3 3 3h6c1.66 0 3-1.34 3-3V8a6 6 0 0 0-6-6z"></path></svg>Oscar Winner</span>
+        <span class="spotlight-rating" id="spotlightRating"><svg class="icon-star" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>8.8</span>
       </div>
 
       <p class="spotlight-desc" id="spotlightDesc">A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O., blurring the lines between reality and the subconscious.</p>
@@ -130,49 +139,60 @@
   <main class="platform-container">
 
     <!-- AI Search & Recommendation Section -->
-    <section class="search-section" id="searchSection">
-      <div class="section-title-box">
-        <h2>AI-Powered Movie Search</h2>
-        <p>Ask natural language questions in English or Hinglish — our GraphRAG engine queries the Knowledge Graph & Pinecone vectors.</p>
-      </div>
+    <div class="search-card-wrapper">
+      <section class="search-section" id="searchSection">
+        <div class="section-title-box">
+          <div class="sparkles-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"></path></svg>
+            <span>GRAPH-RAG SEARCH CONSOLE</span>
+          </div>
+          <h2>AI-Powered Movie Search</h2>
+          <p>Ask natural language questions in English or Hinglish — our GraphRAG engine queries the Knowledge Graph & Pinecone vectors.</p>
+        </div>
 
-      <form id="searchForm" class="search-box">
-        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
+        <div class="search-input-container" style="position: relative; width: 100%;">
+          <form id="searchForm" class="search-box">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
 
-        <input
-          type="text"
-          id="queryInput"
-          placeholder="e.g. Recommend movies similar to Interstellar..."
-          autocomplete="off"
-          required
-        />
+            <input
+              type="text"
+              id="queryInput"
+              placeholder="e.g. Recommend movies similar to Interstellar..."
+              autocomplete="off"
+              required
+            />
 
-        <button type="button" id="micBtn" class="mic-btn" title="Voice Search">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-            <line x1="12" y1="19" x2="12" y2="23"></line>
-            <line x1="8" y1="23" x2="16" y2="23"></line>
-          </svg>
-        </button>
+            <button type="button" id="micBtn" class="mic-btn" title="Voice Search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+            </button>
 
-        <button type="submit" id="searchBtn" class="submit-btn">
-          <span>Ask AI</span>
-        </button>
-      </form>
+            <button type="submit" id="searchBtn" class="submit-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: -1.5px;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"></path></svg>
+              <span>Ask AI</span>
+            </button>
+          </form>
+          <!-- Suggestions Dropdown -->
+          <div id="suggestionsDropdown" class="suggestions-dropdown hidden"></div>
+        </div>
 
-      <!-- Quick Prompt Chips -->
-      <div class="quick-prompts">
-        <span class="label">Try:</span>
-        <button class="prompt-chip" data-query="Recommend movies similar to Inception">Similar to Inception</button>
-        <button class="prompt-chip" data-query="Nolan ki sabse acchi movie konsi hai">Best Nolan (Hinglish)</button>
-        <button class="prompt-chip" data-query="Which movies directed by Christopher Nolan won Oscars?">Nolan Oscar Winners</button>
-        <button class="prompt-chip" data-query="What movies has Leonardo DiCaprio acted in?">DiCaprio Filmography</button>
-      </div>
-    </section>
+        <!-- Quick Prompt Chips -->
+        <div class="quick-prompts">
+          <span class="label">Try:</span>
+          <button class="prompt-chip" data-query="Recommend movies similar to Inception">Similar to Inception</button>
+          <button class="prompt-chip" data-query="Nolan ki sabse acchi movie konsi hai">Best Nolan (Hinglish)</button>
+          <button class="prompt-chip" data-query="Which movies directed by Christopher Nolan won Oscars?">Nolan Oscar Winners</button>
+          <button class="prompt-chip" data-query="What movies has Leonardo DiCaprio acted in?">DiCaprio Filmography</button>
+        </div>
+      </section>
+    </div>
 
     <!-- Loading Indicator -->
     <div id="loadingIndicator" class="loading-box hidden">
@@ -191,6 +211,9 @@
       </div>
       <div id="answerContent" class="markdown-body">
         <!-- Rendered AI Output -->
+      </div>
+      <div id="recommendedMoviesGrid" class="movie-grid" style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem; display: none;">
+        <!-- Rendered dynamically by app.js -->
       </div>
     </section>
 

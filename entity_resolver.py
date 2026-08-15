@@ -35,11 +35,48 @@ Examples:
 # Simple in-memory cache for entity extraction
 _ENTITY_CACHE = {}
 
+def extract_entities_regex(query: str) -> list[str] | None:
+    q = query.strip().strip("?").strip(".").strip()
+    
+    # Patterns to match and extract
+    patterns = [
+        r"(?:recommend\s+)?movies?\s+similar\s+to\s+(.+)",
+        r"(?:recommend\s+)?something\s+similar\s+to\s+(.+)",
+        r"similar\s+to\s+(.+)",
+        r"movies?\s+like\s+(.+)",
+        r"like\s+(.+)",
+        r"tell\s+me\s+about\s+(.+)",
+        r"info\s+on\s+(.+)",
+        r"explore\s+(.+)",
+        r"directed\s+by\s+(.+)",
+        r"films?\s+by\s+(.+)",
+        r"movies?\s+by\s+(.+)",
+        r"(.+)\s+jaisi\s+movies?",
+        r"(.+)\s+jaisa\s+movies?",
+        r"(.+)\s+ki\s+movies?",
+        r"(.+)\s+acted\s+in",
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, q, re.IGNORECASE)
+        if match:
+            entity = match.group(1).strip()
+            entity = re.sub(r"^['\"“]+|['\"”]+$", "", entity).strip()
+            if entity and len(entity) < 50:
+                return [entity]
+    return None
+
 def extract_entities(query: str) -> list[str]:
-    """Extract entity names from user query using Gemini LLM (with caching)."""
+    """Extract entity names from user query using regex first, then caching + Gemini LLM."""
     q_key = query.strip().lower()
     if q_key in _ENTITY_CACHE:
         return _ENTITY_CACHE[q_key]
+
+    regex_res = extract_entities_regex(query)
+    if regex_res is not None:
+        print(f"   ⚡ Fast regex entity extraction: {regex_res}")
+        _ENTITY_CACHE[q_key] = regex_res
+        return regex_res
 
     prompt = """You extract entity names from movie-related queries in English, Hindi, or Hinglish.
 

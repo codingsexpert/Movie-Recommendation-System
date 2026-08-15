@@ -81,7 +81,7 @@ def fallback_vector_search(query: str) -> str:
 
     search_results = pinecone_index.query(
         vector=query_vector,
-        top_k=20,
+        top_k=8,
         include_metadata=True
     )
 
@@ -101,7 +101,7 @@ Here are {len(candidates)} movies from our database:
 {formatted_candidates}
 
 Pick the 5 BEST matches for what the user is looking for.
-For each pick, explain in 1-2 sentences WHY it fits.
+For each pick, explain in a single short sentence WHY it fits (keep explanations very concise).
 Do NOT mention databases, vectors, or technical terms.
 Format as a numbered list."""
 
