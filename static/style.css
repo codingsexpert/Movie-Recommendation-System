@@ -119,54 +119,34 @@ body {
   inset: 0;
   z-index: 1;
   overflow: hidden;
-  filter: blur(120px);
   pointer-events: none;
-  opacity: 0.42; /* Increased from 0.15 for high visibility */
-  transition: background var(--transition-mid);
+  opacity: 0.38;
+  background: 
+    radial-gradient(circle at 12% 15%, #8b5cf6 0%, transparent 45%),
+    radial-gradient(circle at 88% 18%, #6366f1 0%, transparent 45%),
+    radial-gradient(circle at 22% 85%, #3b82f6 0%, transparent 40%),
+    radial-gradient(circle at 78% 82%, #06b6d4 0%, transparent 45%),
+    radial-gradient(circle at 50% 25%, #a855f7 0%, transparent 40%),
+    radial-gradient(circle at 15% 55%, #14b8a6 0%, transparent 40%),
+    radial-gradient(circle at 85% 52%, #ec4899 0%, transparent 40%),
+    radial-gradient(circle at 38% 75%, #10b981 0%, transparent 40%),
+    radial-gradient(circle at 62% 65%, #f59e0b 0%, transparent 35%),
+    radial-gradient(circle at 50% 50%, #f43f5e 0%, transparent 45%);
+  background-size: 160% 160%;
+  animation: meshGradient 22s ease infinite alternate;
+  will-change: background-position;
+  transition: opacity var(--transition-mid);
 }
 
 body.light-theme .ambient-glow-bg,
 [data-theme="light"] .ambient-glow-bg {
-  opacity: 0.22; /* Increased from 0.08 for high visibility */
+  opacity: 0.20;
 }
 
-.glow-orb {
-  position: absolute;
-  border-radius: 50%;
-  mix-blend-mode: screen;
-  animation: floatOrb 25s infinite alternate ease-in-out;
-}
-
-body.light-theme .glow-orb,
-[data-theme="light"] .glow-orb {
-  mix-blend-mode: multiply; /* Looks better on white backgrounds */
-}
-
-/* 10 Unique Color Orbs */
-.orb-1 { width: 35vw; height: 35vw; background: #8b5cf6; top: -10%; left: -10%; animation-duration: 28s; }
-.orb-2 { width: 40vw; height: 40vw; background: #6366f1; top: 10%; right: -15%; animation-duration: 32s; animation-delay: -5s; }
-.orb-3 { width: 30vw; height: 30vw; background: #3b82f6; bottom: -5%; left: 15%; animation-duration: 25s; animation-delay: -10s; }
-.orb-4 { width: 35vw; height: 35vw; background: #06b6d4; bottom: 15%; right: 10%; animation-duration: 30s; animation-delay: -3s; }
-.orb-5 { width: 28vw; height: 28vw; background: #14b8a6; top: 30%; left: -5%; animation-duration: 35s; animation-delay: -12s; }
-.orb-6 { width: 32vw; height: 32vw; background: #ec4899; top: 40%; right: 20%; animation-duration: 27s; animation-delay: -7s; }
-.orb-7 { width: 38vw; height: 38vw; background: #f43f5e; bottom: -10%; right: -10%; animation-duration: 33s; animation-delay: -15s; }
-.orb-8 { width: 25vw; height: 25vw; background: #a855f7; top: 5%; left: 40%; animation-duration: 29s; animation-delay: -8s; }
-.orb-9 { width: 30vw; height: 30vw; background: #10b981; bottom: 35%; left: 35%; animation-duration: 31s; animation-delay: -2s; }
-.orb-10 { width: 27vw; height: 27vw; background: #f59e0b; top: 25%; right: 40%; animation-duration: 26s; animation-delay: -14s; }
-
-@keyframes floatOrb {
-  0% {
-    transform: translate(0, 0) scale(1) rotate(0deg);
-  }
-  33% {
-    transform: translate(5vw, -5vh) scale(1.1) rotate(120deg);
-  }
-  66% {
-    transform: translate(-3vw, 8vh) scale(0.9) rotate(240deg);
-  }
-  100% {
-    transform: translate(0, 0) scale(1) rotate(360deg);
-  }
+@keyframes meshGradient {
+  0%   { background-position: 0% 0%; }
+  50%  { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
 }
 
 /* ─── Glassmorphic Navbar ─── */
