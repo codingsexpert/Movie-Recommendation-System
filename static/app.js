@@ -365,6 +365,76 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
+      // Click Event Handlers for Catalog
+      card.addEventListener('click', async (e) => {
+        if (e.target.closest('.poster-btn')) return; // Ignore button clicks
+        
+        if (card.nextElementSibling && card.nextElementSibling.classList.contains('inline-related-panel')) {
+          card.nextElementSibling.remove();
+          card.classList.remove('active-card');
+          return;
+        }
+
+        document.querySelectorAll('.inline-related-panel').forEach(p => p.remove());
+        document.querySelectorAll('.movie-card.active-card').forEach(c => c.classList.remove('active-card'));
+        
+        card.classList.add('active-card');
+        const panel = document.createElement('div');
+        panel.className = 'inline-related-panel';
+        panel.innerHTML = `<div class="spinner" style="margin: 2rem auto;"></div><p style="text-align: center; color: var(--text-secondary);">Finding related movies for ${movie.title}...</p>`;
+        
+        card.parentNode.insertBefore(panel, card.nextSibling);
+        setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+
+        try {
+          const payload = { query: `Recommend movies similar to ${movie.title}` };
+          const response = await fetch('/api/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+          if (!response.ok) throw new Error('API failed');
+          const data = await response.json();
+          const titles = extractMovieTitles(data.answer);
+
+          if (!titles || titles.length === 0) {
+            panel.innerHTML = `<p style="text-align:center; padding: 2rem; color:var(--text-secondary);">No related movies found.</p>`;
+            return;
+          }
+
+          const miniGrid = document.createElement('div');
+          miniGrid.className = 'mini-grid';
+          titles.forEach(t => {
+            const m = allCatalogMovies.find(x => x.title.toLowerCase() === t.toLowerCase()) || { title: t, poster: `/api/poster?title=${encodeURIComponent(t)}` };
+            const pUrl = m.poster || 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg';
+            
+            const mc = document.createElement('div');
+            mc.className = 'mini-card';
+            const escapedMTitle = m.title.replace(/'/g, "\\'");
+            mc.innerHTML = `<img src="${pUrl}" alt="${m.title}" loading="lazy" onerror="handleImageLoadError(this, '${escapedMTitle}')" /><div class="mini-card-title">${m.title}</div>`;
+            mc.addEventListener('click', (ev) => {
+               ev.stopPropagation();
+               const q = `Tell me about ${m.title}`;
+               queryInput.value = q;
+               executeSearch(q);
+               window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            miniGrid.appendChild(mc);
+          });
+          
+          panel.innerHTML = `
+            <div class="inline-panel-header">
+              <h4>Similar to ${movie.title}</h4>
+              <button class="close-panel-btn" id="closePanelBtn">✕</button>
+            </div>
+          `;
+          panel.appendChild(miniGrid);
+          panel.querySelector('#closePanelBtn').addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            panel.remove();
+            card.classList.remove('active-card');
+          });
+        } catch (err) {
+          panel.innerHTML = `<p style="text-align:center; padding: 2rem; color:var(--red);">Failed to load related movies.</p>`;
+        }
+      });
+
       // Event delegation
       card.querySelector('[data-action="recommend"]').addEventListener('click', (e) => {
         e.stopPropagation();
