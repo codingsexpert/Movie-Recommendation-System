@@ -680,7 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         alert('Error triggering sync.');
       } finally {
-        syncTmdbBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M21.5 2v6h-6M2.13 15.57a9 9 0 1 0 3.32-8.3L2 9M2.5 22v-6h6M21.87 8.43a9 9 0 1 0-3.32 8.3L22 15"></path></svg> Sync Trending';
+        syncTmdbBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M21.5 2v6h-6M2.13 15.57a9 9 0 1 0 3.32-8.3L2 9M2.5 22v-6h6M21.87 8.43a9 9 0 1 0-3.32 8.3L22 15"></path></svg> Sync Random Movies';
         syncTmdbBtn.disabled = false;
       }
     });

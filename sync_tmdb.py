@@ -10,15 +10,22 @@ load_dotenv()
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 BASE_URL = "https://api.themoviedb.org/3"
 
+import random
+
 def fetch_trending_movies(limit=10):
     if not TMDB_API_KEY:
         raise ValueError("TMDB_API_KEY is not set in .env")
 
-    print(f"🌍 Fetching trending movies from TMDB...")
-    trending_url = f"{BASE_URL}/trending/movie/week?api_key={TMDB_API_KEY}"
+    random_page = random.randint(1, 500)
+    print(f"🌍 Fetching random popular movies from TMDB (Page {random_page})...")
+    
+    trending_url = f"{BASE_URL}/discover/movie?api_key={TMDB_API_KEY}&page={random_page}&sort_by=popularity.desc"
     response = requests.get(trending_url)
     response.raise_for_status()
-    results = response.json().get("results", [])[:limit]
+    
+    results = response.json().get("results", [])
+    random.shuffle(results)
+    results = results[:limit]
     
     entities = []
     pinecone_vectors = []
