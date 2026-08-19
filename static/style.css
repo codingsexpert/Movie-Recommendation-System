@@ -930,21 +930,31 @@ body.light-theme .ambient-glow-bg,
 
 /* ─── Result & Graph Cards ─── */
 .results-card, .graph-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-top: 4px solid var(--accent);
-  border-radius: var(--radius-xl);
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+  border-radius: var(--radius-2xl);
   padding: 2.5rem;
-  box-shadow: var(--shadow-card);
   margin-bottom: 2.5rem;
   position: relative;
   overflow: hidden;
   transition: transform var(--transition-mid), box-shadow var(--transition-mid);
 }
 
+.results-card::before, .graph-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--accent-glow), transparent);
+  opacity: 0.8;
+}
+
 .results-card:hover, .graph-card:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
+  box-shadow: 0 12px 48px 0 rgba(139, 92, 246, 0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+  transform: translateY(-4px);
 }
 
 .card-header {
@@ -989,34 +999,8 @@ body.light-theme .ambient-glow-bg,
 
 /* ─── Markdown Output ─── */
 .markdown-body {
-  font-size: 0.96rem;
-  line-height: 1.75;
-  color: var(--text-secondary);
-}
-
-.markdown-body p { margin-bottom: 0.95rem; }
-
-.markdown-body ul, .markdown-body ol {
-  margin-left: 1.25rem;
-  margin-bottom: 1.1rem;
-  padding-left: 0.4rem;
-}
-
-.markdown-body li {
-  margin-bottom: 0.9rem;
+  font-family: inherit;
   line-height: 1.7;
-  color: var(--text-secondary);
-}
-
-.markdown-body li::marker {
-  color: var(--accent);
-  font-weight: 800;
-  font-family: 'Outfit', sans-serif;
-}
-
-.markdown-body strong {
-  color: var(--text-primary);
-  font-family: 'Outfit', sans-serif;
   font-weight: 700;
 }
 

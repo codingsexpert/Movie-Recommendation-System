@@ -566,8 +566,8 @@ def get_movie_poster(title: str):
         return RedirectResponse(url=fallback_url)
         
     try:
-        url = f"https://api.themoviedb.org/3/search/movie?api_key={tmdb_key}&query={title}"
-        res = requests.get(url, timeout=3)
+        url = "https://api.themoviedb.org/3/search/movie"
+        res = requests.get(url, params={"api_key": tmdb_key, "query": title}, timeout=3)
         results = res.json().get("results", [])
         if results and results[0].get("poster_path"):
             return RedirectResponse(url=f"https://image.tmdb.org/t/p/w500{results[0]['poster_path']}")

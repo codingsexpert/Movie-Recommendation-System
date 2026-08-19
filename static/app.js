@@ -525,14 +525,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ─── Recommendation Cards Grid ───
   function extractMovieTitles(markdownText) {
-    const titles = [];
-    if (!markdownText) return titles;
-    // Match patterns like "1. **Inception**" or "1. **The Matrix**:" or "- **RRR**"
-    const regex = /(?:\d+\.|\*|-)\s+\*\*([^*]+)\*\*/g;
-    let match;
-    while ((match = regex.exec(markdownText)) !== null) {
-      titles.push(match[1].trim());
-    }
+    // Extract unique titles from bold text, filtering out common false positives like Overview, Director, etc.
+    const rawTitles = Array.from(markdownText.matchAll(/\*\*(.*?)\*\*/g)).map(m => m[1].trim());
+    const titles = [...new Set(rawTitles)].filter(t => {
+      const lower = t.toLowerCase();
+      return t.length > 0 && 
+             !lower.includes('overview') && 
+             !lower.includes('director') && 
+             !lower.includes('actor') &&
+             !lower.includes('release year') &&
+             !lower.includes('genre');
+    });
     return titles;
   }
 
