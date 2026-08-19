@@ -476,11 +476,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const htmlContent = window.marked ? marked.parse(data.answer) : data.answer;
       const extractedTitles = extractMovieTitles(data.answer);
       
-      // Animate HTML typing like YouTube/ChatGPT
-      typeHtml(answerContent, htmlContent, 8, () => {
-        // Once typing finishes, render the matching movie cards below it
+      if (extractedTitles.length > 0) {
+        answerContent.style.display = 'none';
+        const header = resultsSection.querySelector('.card-header');
+        if (header) header.style.display = 'none';
         renderRecommendedMovies(extractedTitles);
-      });
+      } else {
+        answerContent.style.display = 'block';
+        const header = resultsSection.querySelector('.card-header');
+        if (header) header.style.display = 'flex';
+        answerContent.innerHTML = htmlContent;
+        renderRecommendedMovies(extractedTitles);
+      }
 
       const entities = data.resolved ? data.resolved.entities || [] : [];
       if (entities.length > 0) renderGraphCanvas(entities[0].nodeName);
