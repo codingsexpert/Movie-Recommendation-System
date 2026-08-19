@@ -382,6 +382,9 @@ body.light-theme .ambient-glow-bg,
   flex: 1;
   max-width: 750px;
   padding-top: 1.5rem;
+}
+
+.spotlight-info {
   animation: fadeSlideUp 0.7s ease-out;
 }
 

@@ -216,11 +216,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setSpotlight(movie) {
     currentSpotlight = movie;
-    const content = document.querySelector('.spotlight-content');
+    const info = document.getElementById('spotlightInfo');
     const posterImg = document.getElementById('spotlightPosterImg');
     const posterCard = document.getElementById('spotlightPosterCard');
 
-    if (content) { content.style.opacity = '0'; content.style.transform = 'translateY(12px)'; }
+    if (info) { info.style.opacity = '0'; info.style.transform = 'translateY(12px)'; }
     if (posterCard) { posterCard.style.opacity = '0'; posterCard.style.transform = 'translateY(12px)'; }
 
     setTimeout(() => {
@@ -257,11 +257,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const genres = (movie.genres || []).join(' · ');
         spotlightDesc.textContent = `${genres} — Starring ${actors}`;
       }
-      if (content) {
+      if (info) {
         setTimeout(() => {
-          content.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
-          content.style.opacity = '1';
-          content.style.transform = 'translateY(0)';
+          info.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+          info.style.opacity = '1';
+          info.style.transform = 'translateY(0)';
           if (posterCard) {
             posterCard.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
             posterCard.style.opacity = '1';
