@@ -206,18 +206,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch related
     const gridId = panel.querySelector('.mini-grid').id;
     try {
-      const res = await fetch(\`/api/related/\${encodeURIComponent(movie.title)}\`);
+      const res = await fetch(`/api/related/${encodeURIComponent(movie.title)}`);
       if (res.ok) {
         const data = await res.json();
         const miniGrid = document.getElementById(gridId);
         if (miniGrid) {
           if (data.movies && data.movies.length > 0) {
-            miniGrid.innerHTML = data.movies.map(m => \`
-              <div class="mini-card" onclick="alert('Navigating to \${m.title.replace(/'/g, "\\\\'")}')">
-                <img src="\${m.poster || 'https://via.placeholder.com/150x225?text=No+Poster'}" alt="\${m.title}" />
-                <div class="mini-card-title">\${m.title}</div>
+            miniGrid.innerHTML = data.movies.map(m => `
+              <div class="mini-card" onclick="alert('Navigating to ${m.title.replace(/'/g, "\\'")}')">
+                <img src="${m.poster || 'https://via.placeholder.com/150x225?text=No+Poster'}" alt="${m.title}" />
+                <div class="mini-card-title">${m.title}</div>
               </div>
-            \`).join('');
+            `).join('');
           } else {
             miniGrid.innerHTML = '<p style="color:var(--text-muted);">No similar movies found.</p>';
           }
@@ -248,13 +248,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
       loadingIndicator.classList.add('hidden');
       
-      aiSearchTitle.textContent = \`AI Recommendations for: "\${query}"\`;
+      aiSearchTitle.textContent = `AI Recommendations for: "${query}"`;
       aiSearchResults.classList.remove('hidden');
 
       if (data.movies && data.movies.length > 0) {
         renderRow(aiSearchGrid, data.movies);
       } else {
-        aiSearchGrid.innerHTML = \`<p style="color:var(--text-muted); padding: 1rem;">No specific movies found for this query.</p>\`;
+        aiSearchGrid.innerHTML = `<p style="color:var(--text-muted); padding: 1rem;">No specific movies found for this query.</p>`;
       }
 
     } catch (error) {
