@@ -381,6 +381,7 @@ body.light-theme .ambient-glow-bg,
   z-index: 2;
   flex: 1;
   max-width: 750px;
+  padding-top: 1.5rem;
   animation: fadeSlideUp 0.7s ease-out;
 }
 
