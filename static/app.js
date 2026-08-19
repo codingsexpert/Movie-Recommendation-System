@@ -214,7 +214,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (content) { content.style.opacity = '0'; content.style.transform = 'translateY(12px)'; }
 
     setTimeout(() => {
-      if (spotlightBg && movie.backdrop)  spotlightBg.style.backgroundImage = `url('${movie.backdrop}')`;
+      const backdropUrl = movie.backdrop || movie.poster || 'https://image.tmdb.org/t/p/w1280/8ZTVqvKDQ8emSGUEMjsS4yHAiE.jpg';
+      if (spotlightBg) spotlightBg.style.backgroundImage = `url('${backdropUrl}')`;
       if (spotlightTitle)    spotlightTitle.textContent    = movie.title || '';
       if (spotlightYear)     spotlightYear.textContent     = movie.year || '';
       if (spotlightDirector) spotlightDirector.textContent = movie.directors ? movie.directors[0] : '';

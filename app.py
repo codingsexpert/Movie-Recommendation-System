@@ -108,7 +108,7 @@ FALLBACK_CATALOG = [
         "genres": ["Sci-Fi", "Action", "Thriller"],
         "themes": ["Dreams", "Reality", "Subconscious"],
         "awards": ["Oscar Winner (4 Academy Awards)"],
-        "poster": "https://image.tmdb.org/t/p/w500/oYuLEe1hYm1CYjFAbVPIbDEmBwwM.jpg",
+        "poster": "https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w1280/8ZTVqvKDQ8emSGUEMjsS4yHAiE.jpg",
         "trailer": "https://www.youtube.com/embed/YoHD9XEInc0"
     },
@@ -131,7 +131,7 @@ FALLBACK_CATALOG = [
         "themes": ["Justice", "Chaos", "Heroism"],
         "awards": ["Oscar Winner (Heath Ledger Best Supporting Actor)"],
         "poster": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-        "backdrop": "https://image.tmdb.org/t/p/w1280/nMKd2819TyQvW2guWZ5CS2hZXIw.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/dqAKr27h33d9lXnSpFpQpD4e1Jp.jpg",
         "trailer": "https://www.youtube.com/embed/EXeTwQWrcwY"
     },
     {
@@ -141,8 +141,8 @@ FALLBACK_CATALOG = [
         "genres": ["Biography", "Drama", "History"],
         "themes": ["Atomic Age", "Moral Dilemma", "Manhattan Project"],
         "awards": ["Oscar Winner (7 Academy Awards incl. Best Picture)"],
-        "poster": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGvC271PqY.jpg",
-        "backdrop": "https://image.tmdb.org/t/p/w1280/fm6KI8Ofi0Rs2R6hEGUYevjUvy20.jpg",
+        "poster": "https://image.tmdb.org/t/p/w500/ptpr0kHGQWukHtIeStLFSVgZsuq.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/rLb2cwF4rACrmioGlacWKVj9FiB.jpg",
         "trailer": "https://www.youtube.com/embed/uYPbbksJxIg"
     },
     {
@@ -152,8 +152,8 @@ FALLBACK_CATALOG = [
         "genres": ["Mystery", "Thriller", "Psychological"],
         "themes": ["Mental Asylum", "Delusion", "Guilt"],
         "awards": ["National Board of Review Winner"],
-        "poster": "https://image.tmdb.org/t/p/w500/kve20tXMHFueDaWP5Dq3JnGpiJo.jpg",
-        "backdrop": "https://image.tmdb.org/t/p/w1280/w7kWbE2fXbJ4dC41sQhU9o6t0mY.jpg",
+        "poster": "https://image.tmdb.org/t/p/w500/4GDy0KVWky9KmLjW3zYc2W6chx.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/vL5LR6VjFXOpA22bNKlYrL8tfv.jpg",
         "trailer": "https://www.youtube.com/embed/5iaYLCiq5RM"
     },
     {
@@ -164,7 +164,7 @@ FALLBACK_CATALOG = [
         "themes": ["Simulated Reality", "Cyberpunk", "Free Will"],
         "awards": ["Oscar Winner (4 Academy Awards)"],
         "poster": "https://image.tmdb.org/t/p/w500/f89U3ADGfhBJl6ip1pSUEqBKB0e.jpg",
-        "backdrop": "https://image.tmdb.org/t/p/w1280/5v6n6uP3lJ78vK2Cg93W55xW90d.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/oYuLEe1hYm1CYjFAbVPIbDEmBwwM.jpg",
         "trailer": "https://www.youtube.com/embed/vKQi3bBA1y8"
     },
     {
@@ -186,7 +186,7 @@ FALLBACK_CATALOG = [
         "themes": ["Non-linear Storytelling", "Redemption", "Los Angeles Underworld"],
         "awards": ["Oscar Winner (Best Screenplay)"],
         "poster": "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
-        "backdrop": "https://image.tmdb.org/t/p/w1280/suaEOtk1N1sgg2MTM7oHO2z83S5.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/suqC4lhQwG1A3K340aCYc8u3p2H.jpg",
         "trailer": "https://www.youtube.com/embed/s7EdQ4FqbhY"
     },
     {
@@ -229,7 +229,7 @@ FALLBACK_CATALOG = [
         "genres": ["Drama"],
         "themes": ["Hope", "Freedom", "Injustice"],
         "awards": ["7 Oscar Nominations"],
-        "poster": "https://image.tmdb.org/t/p/w500/9cjIGJaKPHQKactAF6m14FWMIOL.jpg",
+        "poster": "https://image.tmdb.org/t/p/w500/9cqN021FmmywsP9b6yWvLNx6sXi.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w1280/kXfqcdQKsToO0OUXHcrrNCHDBzO.jpg",
         "trailer": "https://www.youtube.com/embed/PLl99DlL6b4"
     },
@@ -241,7 +241,7 @@ FALLBACK_CATALOG = [
         "themes": ["Revenge", "Honor", "Roman Empire"],
         "awards": ["Oscar Winner (Best Picture)"],
         "poster": "https://image.tmdb.org/t/p/w500/ty8TGRuvJLPUmAR1H1nRIsgwSmL.jpg",
-        "backdrop": "https://image.tmdb.org/t/p/w1280/Ar7QuEEQMFDMemjH6Y91LadKnvb.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/vE8K87vA6n0e2380fG7G4.jpg",
         "trailer": "https://www.youtube.com/embed/owK1qxDselE"
     },
     {
@@ -274,7 +274,7 @@ FALLBACK_CATALOG = [
         "themes": ["Class Divide", "Greed", "Social Commentary"],
         "awards": ["Oscar Winner (Best Picture — first non-English)"],
         "poster": "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
-        "backdrop": "https://image.tmdb.org/t/p/w1280/TU9NIjwzjoKPwQHoHshkFcQUCG8.jpg",
+        "backdrop": "https://image.tmdb.org/t/p/w1280/hiKmpZMGZOSXAAt16Ujwo2lfv1W.jpg",
         "trailer": "https://www.youtube.com/embed/5xH0HfJHsaY"
     },
     {
