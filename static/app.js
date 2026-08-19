@@ -298,15 +298,15 @@ document.addEventListener('DOMContentLoaded', () => {
             <h3 class="poster-movie-title">${movie.title}</h3>
             <div class="poster-meta">${yearText}${genresText ? ' · ' + genresText : ''}</div>
             <div class="poster-actions">
-              <button class="poster-btn poster-btn-primary" data-action="recommend" data-title="${movie.title}">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <button class="poster-btn poster-btn-primary poster-btn-cta" data-action="recommend" data-title="${movie.title}" title="Find Similar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 Similar
               </button>
-              <button class="poster-btn poster-btn-red" data-action="trailer" data-title="${movie.title}">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 2px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>Trailer
+              <button class="poster-btn poster-btn-red poster-btn-icon" data-action="trailer" data-title="${movie.title}" title="Watch Trailer">
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
               </button>
-              <button class="poster-btn poster-btn-ghost" data-action="graph" data-title="${movie.title}">
-                Graph
+              <button class="poster-btn poster-btn-ghost poster-btn-icon" data-action="graph" data-title="${movie.title}" title="View Graph">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/><line x1="6" y1="7" x2="10" y2="10"/><line x1="18" y1="7" x2="14" y2="10"/><line x1="6" y1="17" x2="10" y2="14"/><line x1="18" y1="17" x2="14" y2="14"/></svg>
               </button>
             </div>
           </div>
@@ -575,17 +575,17 @@ document.addEventListener('DOMContentLoaded', () => {
             <h3 class="poster-movie-title">${movie.title}</h3>
             <div class="poster-meta">${yearText}${yearText && genresText ? ' · ' : ''}${genresText}</div>
             <div class="poster-actions">
-              <button class="poster-btn poster-btn-primary" data-action="recommend" data-title="${movie.title}">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <button class="poster-btn poster-btn-primary poster-btn-cta" data-action="recommend" data-title="${movie.title}" title="Find Similar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 Similar
               </button>
               ${movie.trailer ? `
-              <button class="poster-btn poster-btn-red" data-action="trailer" data-title="${movie.title}">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 2px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>Trailer
+              <button class="poster-btn poster-btn-red poster-btn-icon" data-action="trailer" data-title="${movie.title}" title="Watch Trailer">
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
               </button>
               ` : ''}
-              <button class="poster-btn poster-btn-ghost" data-action="graph" data-title="${movie.title}">
-                Graph
+              <button class="poster-btn poster-btn-ghost poster-btn-icon" data-action="graph" data-title="${movie.title}" title="View Graph">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/><line x1="6" y1="7" x2="10" y2="10"/><line x1="18" y1="7" x2="14" y2="10"/><line x1="6" y1="17" x2="10" y2="14"/><line x1="18" y1="17" x2="14" y2="14"/></svg>
               </button>
             </div>
           </div>
