@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from neo4j import GraphDatabase
+from neo4j import GraphDatabase, AsyncGraphDatabase
 from pinecone import Pinecone
 from langchain_google_genai import ChatGoogleGenerativeAI
 from google import genai
@@ -18,6 +18,7 @@ NEO4J_USERNAME = os.getenv("NEO4J_USERNAME", "neo4j").strip()
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "").strip()
 
 driver = None
+async_driver = None
 if NEO4J_URI:
     try:
         temp_driver = GraphDatabase.driver(
@@ -27,10 +28,17 @@ if NEO4J_URI:
         )
         temp_driver.verify_connectivity()
         driver = temp_driver
-        print("✅ Neo4j: Connected and verified connectivity!")
+        
+        async_driver = AsyncGraphDatabase.driver(
+            NEO4J_URI,
+            auth=(NEO4J_USERNAME, NEO4J_PASSWORD),
+            connection_timeout=2.0
+        )
+        print("✅ Neo4j: Connected and verified connectivity (Sync & Async)!")
     except Exception as e:
         print(f"⚠️ Warning initializing Neo4j driver (using fallback vector/similarity mode): {e}")
         driver = None
+        async_driver = None
 
 
 # =====================================================================
@@ -62,7 +70,7 @@ if GEMINI_API_KEY:
             model="gemini-2.5-flash",
             api_key=GEMINI_API_KEY,
             temperature=0,
-            max_retries=0
+            max_retries=3
         )
         genai_client = genai.Client(api_key=GEMINI_API_KEY)
     except Exception as e:

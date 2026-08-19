@@ -126,17 +126,19 @@ async def fallback_vector_search(query: str, user_id: str = None) -> str:
 Here are {len(candidates)} movies from our database:
 {formatted_candidates}
 
-Pick the 5 BEST matches for what the user is looking for.
-For each pick, explain in a single short sentence WHY it fits (keep explanations very concise).
-Do NOT mention databases, vectors, or technical terms.
-Format as a numbered list."""
+Your task:
+1. If the user's query is completely unrelated to movies or if NONE of these movies are a good match for what the user is looking for, politely reply: "I couldn't find any relevant movies for your query. Please try searching for a different movie, genre, or keyword."
+2. Otherwise, pick the top 5 BEST matches.
+3. For each pick, explain in a single short sentence WHY it fits (keep explanations very concise).
+4. Do NOT mention databases, vectors, or technical terms.
+5. Format as a numbered list."""
 
     try:
         # Note: llm.invoke is blocking, we could use ainvoke if supported, 
         # but for simplicity we keep it as invoke in this context, or await if supported.
         # langchain_google_genai supports ainvoke
         response = await llm.ainvoke([
-            {"role": "system", "content": "You are a movie recommendation expert. Respond ONLY with a numbered list of movie recommendations with short explanations. Never respond with JSON."},
+            {"role": "system", "content": "You are a movie recommendation expert. Respond ONLY with a numbered list of movie recommendations with short explanations, OR politely decline if no movies match. Never respond with JSON."},
             {"role": "user", "content": prompt}
         ])
 
@@ -145,13 +147,8 @@ Format as a numbered list."""
             answer = " ".join([b.text if hasattr(b, "text") else str(b) for b in answer])
         return answer.strip()
     except Exception as err:
-        print(f"⚠️ Vector search LLM invocation failed ({err}). Formatting offline candidate list directly...")
-        res_lines = ["### Recommended Movie Matches\n\nHere are top matching movies retrieved from our Vector Database:\n"]
-        for idx, text in enumerate(candidates[:5], 1):
-            title = extract_title_from_chunk(text) or f"Match {idx}"
-            clean_text = text[:160].replace('\n', ' ')
-            res_lines.append(f"{idx}. **{title}**\n   - **Overview:** {clean_text}...")
-        return "\n\n".join(res_lines)
+        print(f"⚠️ Vector search LLM invocation failed ({err}). Returning generic error response.")
+        return "Sorry, the recommendation engine is currently experiencing high load. Please try again in a few moments."
 
 async def handle_similarity_query(query: str, resolved_entities: dict, user_id: str = None) -> str:
     """Main similarity handler: Pinecone + Neo4j + LLM + Personalization."""
@@ -263,9 +260,5 @@ Format as a numbered list."""
             answer = " ".join([b.text if hasattr(b, "text") else str(b) for b in answer])
         return answer.strip()
     except Exception as err:
-        print(f"⚠️ LLM invocation failed ({err}). Formatting offline recommendation list directly from graph database...")
-        res_lines = [f"### Recommended Movies Similar to **{movie_name}**\n\nBased on shared genres (**{', '.join(source_genres)}**) and themes from our Knowledge Graph:\n"]
-        for idx, c in enumerate(candidate_list[:5], 1):
-            overview = c['chunkText'][:160].replace('\n', ' ') if c['chunkText'] else "Matches genre and thematic profile."
-            res_lines.append(f"{idx}. **{c['title']}**\n   - **Genres:** {c['genres']}\n   - **Overview:** {overview}...")
-        return "\n\n".join(res_lines)
+        print(f"⚠️ LLM invocation failed ({err}). Returning generic error response.")
+        return "Sorry, the recommendation engine is currently experiencing high load. Please try again in a few moments."
