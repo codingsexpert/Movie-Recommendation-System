@@ -73,8 +73,34 @@ def filter_by_genre(movie_titles: list[str], source_genres: list[str]) -> list[d
         print(f"⚠️ Neo4j error in filter_by_genre: {e}")
         return []
 
+def get_user_profile(user_id: str) -> dict:
+    """Fetch top genres and directors a user has interacted with."""
+    if not driver or not user_id:
+        return {"genres": [], "directors": []}
+    try:
+        with driver.session() as session:
+            # Top 3 Genres
+            genre_res = session.run("""
+                MATCH (u:User {id: $userId})-[r:INTERACTED_WITH]->(m:Movie)-[:BELONGS_TO]->(g:Genre)
+                RETURN g.name AS genre, sum(r.count) AS score
+                ORDER BY score DESC LIMIT 3
+            """, userId=user_id)
+            top_genres = [rec["genre"] for rec in genre_res]
 
-def fallback_vector_search(query: str) -> str:
+            # Top 3 Directors
+            dir_res = session.run("""
+                MATCH (u:User {id: $userId})-[r:INTERACTED_WITH]->(m:Movie)<-[:DIRECTED]-(d:Director)
+                RETURN d.name AS director, sum(r.count) AS score
+                ORDER BY score DESC LIMIT 3
+            """, userId=user_id)
+            top_dirs = [rec["director"] for rec in dir_res]
+            
+            return {"genres": top_genres, "directors": top_dirs}
+    except Exception as e:
+        print(f"⚠️ Neo4j user profile error: {e}")
+        return {"genres": [], "directors": []}
+
+def fallback_vector_search(query: str, user_id: str = None) -> str:
     """Fallback: Pure vector search when no specific movie entity is resolved."""
     print("   📐 Fallback: Pure vector search...")
     query_vector = embed_text(query)
@@ -124,17 +150,23 @@ Format as a numbered list."""
             res_lines.append(f"{idx}. **{title}**\n   - **Overview:** {clean_text}...")
         return "\n\n".join(res_lines)
 
-def handle_similarity_query(query: str, resolved_entities: dict) -> str:
-    """Main similarity handler: Pinecone + Neo4j + LLM."""
+def handle_similarity_query(query: str, resolved_entities: dict, user_id: str = None) -> str:
+    """Main similarity handler: Pinecone + Neo4j + LLM + Personalization."""
     entities = resolved_entities.get("entities", [])
     movie_entity = next((e for e in entities if e["label"] == "Movie"), None)
 
     if not movie_entity:
         print("   ⚠️ No movie entity resolved. Falling back to vector search...")
-        return fallback_vector_search(query)
+        return fallback_vector_search(query, user_id)
 
     movie_name = movie_entity["nodeName"]
     print(f"   🎬 Finding movies similar to: \"{movie_name}\"")
+
+    # Fetch User Profile
+    user_profile = get_user_profile(user_id)
+    profile_context = ""
+    if user_profile["genres"] or user_profile["directors"]:
+        profile_context = f"\nPERSONALIZATION:\nThis user usually likes Genres: {', '.join(user_profile['genres'])} and Directors: {', '.join(user_profile['directors'])}.\nGive a slight boost to movies matching this taste if applicable.\n"
 
     # Step 2: Pinecone top 50 candidates
     print("   📐 Searching Pinecone (top 50)...")
@@ -161,7 +193,7 @@ def handle_similarity_query(query: str, resolved_entities: dict) -> str:
 
     if not source_genres:
         print(f"   ⚠️ No genres found for \"{movie_name}\". Using vector results only.")
-        return fallback_vector_search(query)
+        return fallback_vector_search(query, user_id)
 
     # Step 4: Extract titles from top 50 chunks
     candidate_titles = []
@@ -186,7 +218,7 @@ def handle_similarity_query(query: str, resolved_entities: dict) -> str:
         return f"I found movies in the database but none share genres with \"{movie_name}\" ({', '.join(source_genres)}). Try a broader search."
 
     # Step 6: LLM top 10 selection
-    print("   🤖 LLM selecting top 10...")
+    print("   🤖 LLM selecting top 5 (with Personalization)...")
     candidate_list = [
         {
             "title": m["title"],
@@ -204,16 +236,16 @@ def handle_similarity_query(query: str, resolved_entities: dict) -> str:
     prompt = f"""The user wants movies similar to: "{movie_name}"
   - Genres: {', '.join(source_genres)}
   - Themes: {', '.join(source_themes)}
-
-Here are {len(candidate_list)} movies that share at least one genre:
+{profile_context}
+Here are {len(candidate_list)} candidate movies:
 {formatted_list}
 
 Pick the 5 BEST matches. Rank by:
-1. Genre overlap (most important)
-2. Theme similarity (from the chunk text)
-3. Overall vibe/style match
+1. Genre overlap
+2. User Personalization (if applicable)
+3. Theme similarity
 
-For each pick, explain in 1-2 sentences WHY it's similar.
+For each pick, explain in 1-2 sentences WHY it's similar (or how it matches their taste).
 Do NOT mention databases, vectors, scores, or technical terms.
 Format as a numbered list."""
 

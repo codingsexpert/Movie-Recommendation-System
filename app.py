@@ -12,8 +12,10 @@ from query_classifier import classify_query
 from graph_handler import handle_graph_query
 from similarity_handler import handle_similarity_query
 from run_indexing import run_indexing
+from tracking_handler import router as tracking_router
 
 app = FastAPI(title="GraphRAG Movie Recommendation Engine")
+app.include_router(tracking_router)
 
 # CORS middleware
 app.add_middleware(
@@ -26,6 +28,7 @@ app.add_middleware(
 
 class QueryRequest(BaseModel):
     query: str
+    userId: str = None
 
 class CypherRequest(BaseModel):
     cypher: str
@@ -541,12 +544,21 @@ def upload_and_index_pdf(background_tasks: BackgroundTasks, file: UploadFile = F
         "file_path": file_path
     }
 
+from cache_manager import get_cached_response, set_cached_response, generate_cache_key
+
 @app.post("/api/query")
 def process_rag_query(req: QueryRequest):
     """Execute GraphRAG Pipeline and return step-by-step resolution & output."""
     query = req.query.strip()
     if not query:
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
+
+    # 1. Check Cache First
+    cache_key = generate_cache_key("query", text=query.lower())
+    cached_data = get_cached_response(cache_key)
+    if cached_data:
+        print(f"⚡ Cache Hit: '{query}'")
+        return cached_data
 
     try:
         resolved = resolve_query_entities(query)
@@ -555,11 +567,11 @@ def process_rag_query(req: QueryRequest):
         reasoning = classification.get("reasoning", "")
 
         if query_type == "similarity":
-            answer = handle_similarity_query(query, resolved)
+            answer = handle_similarity_query(query, resolved, req.userId)
         else:
             answer = handle_graph_query(query, resolved)
 
-        return {
+        response_data = {
             "query": query,
             "resolved": resolved,
             "classification": {
@@ -568,6 +580,11 @@ def process_rag_query(req: QueryRequest):
             },
             "answer": answer
         }
+
+        # 2. Save to Cache
+        set_cached_response(cache_key, response_data, ttl_seconds=3600)
+        return response_data
+
     except Exception as e:
         err_msg = str(e)
         if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg:

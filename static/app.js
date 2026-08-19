@@ -29,6 +29,25 @@ window.handleImageLoadError = function(img, title) {
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // ─── User Profile & Tracking ───
+  let userId = localStorage.getItem('userId');
+  if (!userId) {
+    userId = 'user_' + Math.random().toString(36).substring(2, 15);
+    localStorage.setItem('userId', userId);
+  }
+  
+  window.trackEvent = async function(eventType, targetId, targetName) {
+    try {
+      await fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, eventType, targetId, targetName })
+      });
+    } catch (e) {
+      console.warn('Tracking failed:', e);
+    }
+  };
+
   // ─── DOM References ───
   const searchForm          = document.getElementById('searchForm');
   const queryInput          = document.getElementById('queryInput');
@@ -215,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const DEFAULT_CINEMA_BG = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80';
 
   function setSpotlight(movie) {
+    if (window.trackEvent && movie.title) trackEvent('movie_click', 'movie', movie.title);
     currentSpotlight = movie;
     const info = document.getElementById('spotlightInfo');
     const posterImg = document.getElementById('spotlightPosterImg');
@@ -388,6 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (spotlightRecommendBtn) {
     spotlightRecommendBtn.addEventListener('click', () => {
       const t = currentSpotlight ? currentSpotlight.title : 'Inception';
+      if (window.trackEvent) trackEvent('similar_click', 'movie', t);
       queryInput.value = `Recommend movies similar to ${t}`;
       executeSearch(queryInput.value);
     });
@@ -443,7 +464,11 @@ document.addEventListener('DOMContentLoaded', () => {
     loadingIndicator.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     try {
-      const response = await fetch('/api/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query }) });
+      if (window.trackEvent) trackEvent('search', 'query', query);
+      const payload = { query: query };
+      if (typeof userId !== 'undefined') payload.userId = userId;
+      
+      const response = await fetch('/api/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (!response.ok) throw new Error('API failed');
       const data = await response.json();
       loadingIndicator.classList.add('hidden');
