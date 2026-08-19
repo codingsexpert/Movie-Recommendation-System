@@ -318,6 +318,110 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !trailerModal.classList.contains('hidden')) closeTrailer(); });
 
   // ═══════════════════════════════════════════════════
+  // Hotstar Panel Helper
+  // ═══════════════════════════════════════════════════
+  async function handleHotstarPanelClick(e, card, movie) {
+    if (e.target.closest('.poster-btn')) return;
+
+    if (card.nextElementSibling && card.nextElementSibling.classList.contains('hotstar-panel')) {
+      card.nextElementSibling.remove();
+      card.classList.remove('active-card');
+      return;
+    }
+
+    document.querySelectorAll('.hotstar-panel').forEach(p => p.remove());
+    document.querySelectorAll('.movie-card.active-card').forEach(c => c.classList.remove('active-card'));
+    document.querySelectorAll('.movie-card.loading-active').forEach(c => c.classList.remove('loading-active'));
+    
+    card.classList.add('loading-active');
+
+    try {
+      const response = await fetch(`/api/related/${encodeURIComponent(movie.title)}`);
+      if (!response.ok) throw new Error('API failed');
+      const data = await response.json();
+      const titles = data.movies || [];
+
+      card.classList.remove('loading-active');
+      if (!titles || titles.length === 0) return;
+
+      card.classList.add('active-card');
+      
+      const backdropUrl = movie.backdrop || movie.poster || 'https://image.tmdb.org/t/p/w1280/rLb2cwF4rACrmioGlacWKVj9FiB.jpg';
+      const genresStr = movie.genres ? movie.genres.join(' | ') : 'Movies';
+      const ratingStr = movie.rating ? `IMDb ${movie.rating}` : '';
+      const yearStr = movie.year || '';
+
+      const panel = document.createElement('div');
+      panel.className = 'hotstar-panel';
+      panel.innerHTML = `
+        <button class="hotstar-close" id="closePanelBtn">✕</button>
+        <div class="hotstar-hero" style="background-image: url('${backdropUrl.replace(/'/g, "\\'")}');">
+          <div class="hotstar-content">
+            <h2 class="hotstar-title">${movie.title}</h2>
+            <div class="hotstar-meta">
+              ${ratingStr ? `<span class="imdb">${ratingStr}</span>` : ''}
+              ${yearStr ? `<span>• ${yearStr}</span>` : ''}
+              <span>• A</span>
+              <span>• 2h 15m</span>
+              <span>• Hindi, English</span>
+            </div>
+            <div class="hotstar-overview">
+              Tracing the remarkable journey of the protagonist in a world filled with challenges and unexpected turns. Based on a true story that will leave you inspired.
+            </div>
+            <div class="hotstar-genres">${genresStr}</div>
+            <div class="hotstar-actions">
+              <button class="hotstar-btn-play" id="hsPlayBtn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Subscribe to Watch
+              </button>
+              <button class="hotstar-btn-add">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="hotstar-related-section">
+          <div class="hotstar-related-heading">More Like This</div>
+        </div>
+      `;
+      
+      const miniGrid = document.createElement('div');
+      miniGrid.className = 'mini-grid';
+      titles.forEach(t => {
+        const m = allCatalogMovies.find(x => x.title.toLowerCase() === t.toLowerCase()) || { title: t, poster: `/api/poster?title=${encodeURIComponent(t)}` };
+        const pUrl = m.poster || 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg';
+        
+        const mc = document.createElement('div');
+        mc.className = 'mini-card';
+        const escapedMTitle = m.title.replace(/'/g, "\\'");
+        mc.innerHTML = `<img src="${pUrl}" alt="${m.title}" loading="lazy" onerror="handleImageLoadError(this, '${escapedMTitle}')" /><div class="mini-card-title">${m.title}</div>`;
+        mc.addEventListener('click', (ev) => {
+           ev.stopPropagation();
+           const q = `Tell me about ${m.title}`;
+           queryInput.value = q;
+           executeSearch(q);
+           window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        miniGrid.appendChild(mc);
+      });
+      
+      panel.querySelector('.hotstar-related-section').appendChild(miniGrid);
+      card.parentNode.insertBefore(panel, card.nextSibling);
+      setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+
+      panel.querySelector('#closePanelBtn').addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        panel.remove();
+        card.classList.remove('active-card');
+      });
+
+      panel.querySelector('#hsPlayBtn').addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        openTrailer(movie.title, movie.trailer);
+      });
+    } catch (err) {
+      card.classList.remove('loading-active');
+    }
+  }
+
+  // ═══════════════════════════════════════════════════
   // Netflix-Style Pure Poster Card Renderer
   // ═══════════════════════════════════════════════════
   function renderMovieGrid(movies) {
@@ -362,75 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
-      // Click Event Handlers for Catalog
-      card.addEventListener('click', async (e) => {
-        if (e.target.closest('.poster-btn')) return; // Ignore button clicks
-        
-        if (card.nextElementSibling && card.nextElementSibling.classList.contains('inline-related-panel')) {
-          card.nextElementSibling.remove();
-          card.classList.remove('active-card');
-          return;
-        }
-
-        document.querySelectorAll('.inline-related-panel').forEach(p => p.remove());
-        document.querySelectorAll('.movie-card.active-card').forEach(c => c.classList.remove('active-card'));
-        document.querySelectorAll('.movie-card.loading-active').forEach(c => c.classList.remove('loading-active'));
-        
-        card.classList.add('loading-active');
-
-        try {
-          const response = await fetch(`/api/related/${encodeURIComponent(movie.title)}`);
-          if (!response.ok) throw new Error('API failed');
-          const data = await response.json();
-          const titles = data.movies || [];
-
-          card.classList.remove('loading-active');
-          if (!titles || titles.length === 0) return;
-
-          card.classList.add('active-card');
-          const panel = document.createElement('div');
-          panel.className = 'inline-related-panel';
-          
-          const miniGrid = document.createElement('div');
-          miniGrid.className = 'mini-grid';
-          titles.forEach(t => {
-            const m = allCatalogMovies.find(x => x.title.toLowerCase() === t.toLowerCase()) || { title: t, poster: `/api/poster?title=${encodeURIComponent(t)}` };
-            const pUrl = m.poster || 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg';
-            
-            const mc = document.createElement('div');
-            mc.className = 'mini-card';
-            const escapedMTitle = m.title.replace(/'/g, "\\'");
-            mc.innerHTML = `<img src="${pUrl}" alt="${m.title}" loading="lazy" onerror="handleImageLoadError(this, '${escapedMTitle}')" /><div class="mini-card-title">${m.title}</div>`;
-            mc.addEventListener('click', (ev) => {
-               ev.stopPropagation();
-               const q = `Tell me about ${m.title}`;
-               queryInput.value = q;
-               executeSearch(q);
-               window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-            miniGrid.appendChild(mc);
-          });
-          
-          panel.innerHTML = `
-            <div class="inline-panel-header">
-              <h4>Similar to ${movie.title}</h4>
-              <button class="close-panel-btn" id="closePanelBtn">✕</button>
-            </div>
-          `;
-          panel.appendChild(miniGrid);
-          
-          card.parentNode.insertBefore(panel, card.nextSibling);
-          setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
-
-          panel.querySelector('#closePanelBtn').addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            panel.remove();
-            card.classList.remove('active-card');
-          });
-        } catch (err) {
-          card.classList.remove('loading-active');
-        }
-      });
+      card.addEventListener('click', (e) => handleHotstarPanelClick(e, card, movie));
 
 
 
@@ -671,75 +707,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
       // Click Event Handlers
-      // 1. Card Click -> Expand inline similar movies
-      card.addEventListener('click', async (e) => {
-        if (e.target.closest('.poster-btn')) return; // Ignore button clicks
-        
-        if (card.nextElementSibling && card.nextElementSibling.classList.contains('inline-related-panel')) {
-          card.nextElementSibling.remove();
-          card.classList.remove('active-card');
-          return;
-        }
-
-        document.querySelectorAll('.inline-related-panel').forEach(p => p.remove());
-        document.querySelectorAll('.movie-card.active-card').forEach(c => c.classList.remove('active-card'));
-        document.querySelectorAll('.movie-card.loading-active').forEach(c => c.classList.remove('loading-active'));
-        
-        card.classList.add('loading-active');
-
-        try {
-          const response = await fetch(`/api/related/${encodeURIComponent(movie.title)}`);
-          if (!response.ok) throw new Error('API failed');
-          const data = await response.json();
-          const titles = data.movies || [];
-
-          card.classList.remove('loading-active');
-          if (!titles || titles.length === 0) return;
-
-          card.classList.add('active-card');
-          const panel = document.createElement('div');
-          panel.className = 'inline-related-panel';
-          
-          const miniGrid = document.createElement('div');
-          miniGrid.className = 'mini-grid';
-          titles.forEach(t => {
-            const m = allCatalogMovies.find(x => x.title.toLowerCase() === t.toLowerCase()) || { title: t, poster: `/api/poster?title=${encodeURIComponent(t)}` };
-            const pUrl = m.poster || 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg';
-            
-            const mc = document.createElement('div');
-            mc.className = 'mini-card';
-            const escapedMTitle = m.title.replace(/'/g, "\\'");
-            mc.innerHTML = `<img src="${pUrl}" alt="${m.title}" loading="lazy" onerror="handleImageLoadError(this, '${escapedMTitle}')" /><div class="mini-card-title">${m.title}</div>`;
-            mc.addEventListener('click', (ev) => {
-               ev.stopPropagation();
-               const q = `Tell me about ${m.title}`;
-               queryInput.value = q;
-               executeSearch(q);
-               window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-            miniGrid.appendChild(mc);
-          });
-          
-          panel.innerHTML = `
-            <div class="inline-panel-header">
-              <h4>Similar to ${movie.title}</h4>
-              <button class="close-panel-btn" id="closePanelBtn">✕</button>
-            </div>
-          `;
-          panel.appendChild(miniGrid);
-          
-          card.parentNode.insertBefore(panel, card.nextSibling);
-          setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
-
-          panel.querySelector('#closePanelBtn').addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            panel.remove();
-            card.classList.remove('active-card');
-          });
-        } catch (err) {
-          card.classList.remove('loading-active');
-        }
-      });
+      card.addEventListener('click', (e) => handleHotstarPanelClick(e, card, movie));
 
       // 2. Button Handlers
 

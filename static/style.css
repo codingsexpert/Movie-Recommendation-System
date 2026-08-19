@@ -998,17 +998,18 @@ body.light-theme .ambient-glow-bg,
 }
 
 /* ─── Markdown Output ─── */
-/* ─── Inline Related Panel ─── */
-.inline-related-panel {
+/* ─── Hotstar Hero Panel ─── */
+.hotstar-panel {
   grid-column: 1 / -1;
-  background: transparent;
-  border: none;
-  border-top: 1px solid rgba(139, 92, 246, 0.3);
-  padding: 2rem 0;
+  background: #0f1014;
+  width: 100%;
   margin-top: 1rem;
   margin-bottom: 2rem;
-  box-shadow: none;
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
   animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8);
 }
 
 @keyframes slideDown {
@@ -1016,26 +1017,117 @@ body.light-theme .ambient-glow-bg,
   to { opacity: 1; transform: translateY(0); }
 }
 
-.inline-panel-header {
+.hotstar-hero {
+  position: relative;
+  width: 100%;
+  min-height: 480px;
+  background-size: cover;
+  background-position: center top;
+}
+
+.hotstar-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #0f1014 5%, rgba(15, 16, 20, 0.7) 40%, rgba(15, 16, 20, 0) 70%),
+              linear-gradient(to top, #0f1014 0%, rgba(15, 16, 20, 0.5) 40%, rgba(15, 16, 20, 0) 100%);
+}
+
+.hotstar-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 60%;
+  padding: 3rem;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: flex-end;
+  z-index: 2;
+}
+
+.hotstar-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.hotstar-meta {
+  display: flex;
   align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  color: #e5e5e5;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.hotstar-meta .imdb {
+  color: #3b82f6;
+  font-weight: 800;
+}
+
+.hotstar-overview {
+  font-size: 1.05rem;
+  color: #d4d4d4;
+  line-height: 1.6;
   margin-bottom: 1.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 90%;
 }
 
-.inline-panel-header h4 {
-  color: var(--accent);
-  margin: 0;
-  font-size: 1.2rem;
+.hotstar-genres {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 2rem;
+  word-spacing: 5px;
 }
 
-.close-panel-btn {
-  background: rgba(255, 255, 255, 0.1);
+.hotstar-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.hotstar-btn-play {
+  background: linear-gradient(90deg, #0052d4, #4364f7, #6fb1fc);
+  background-size: 200% auto;
+  color: white;
   border: none;
-  color: var(--text);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s;
+}
+
+.hotstar-btn-play:hover {
+  background-position: right center;
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(67, 100, 247, 0.4);
+}
+
+.hotstar-btn-add {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  width: 52px;
+  height: 52px;
+  font-size: 1.8rem;
+  border-radius: var(--radius-md);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1043,9 +1135,40 @@ body.light-theme .ambient-glow-bg,
   transition: all 0.2s;
 }
 
-.close-panel-btn:hover {
-  background: var(--red);
+.hotstar-btn-add:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
 }
+
+.hotstar-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.2s;
+  line-height: 1;
+}
+.hotstar-close:hover {
+  color: white;
+}
+
+.hotstar-related-section {
+  padding: 2rem 3rem;
+  background: #0f1014;
+}
+
+.hotstar-related-heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
 
 .mini-grid {
   display: grid;
