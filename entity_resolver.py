@@ -121,81 +121,77 @@ Examples:
         return fallback_res
 
 def resolve_entity(entity_name: str) -> list[dict]:
-    """Resolve ONE entity across ALL node types in Neo4j (Exact match first, then CONTAINS)."""
+    """Resolve ONE entity across ALL node types in Neo4j (Exact match first, then CONTAINS) using a single optimized query."""
     matches = []
     if not driver:
         return matches
 
     try:
         with driver.session() as session:
-            for node_type in NODE_TYPES:
-                label = node_type["label"]
-                property_name = node_type["property"]
+            # 1. Exact match across all relevant labels in ONE query
+            exact_cypher = """
+                MATCH (n)
+                WHERE (n:Movie OR n:Director OR n:Actor OR n:Genre OR n:Theme OR n:Award)
+                  AND toLower(COALESCE(n.title, n.name)) = toLower($name)
+                RETURN COALESCE(n.title, n.name) AS nodeName, labels(n)[0] AS label
+                LIMIT 5
+            """
+            exact_res = session.run(exact_cypher, name=entity_name)
+            for rec in exact_res:
+                matches.append({
+                    "searchTerm": entity_name,
+                    "label": rec["label"],
+                    "nodeName": rec["nodeName"],
+                    "matchType": "exact"
+                })
 
-                # 1. Exact match (case-insensitive)
-                exact_cypher = f"""
-                    MATCH (n:{label})
-                    WHERE toLower(n.{property_name}) = toLower($name)
-                    RETURN n.{property_name} AS nodeName, labels(n)[0] AS label
-                    LIMIT 5
-                """
-                exact_res = session.run(exact_cypher, name=entity_name)
-                exact_records = list(exact_res)
+            if matches:
+                return matches
 
-                if exact_records:
-                    for rec in exact_records:
-                        matches.append({
-                            "searchTerm": entity_name,
-                            "label": rec["label"],
-                            "nodeName": rec["nodeName"],
-                            "matchType": "exact"
-                        })
-                    continue
+            # 2. Partial match across all relevant labels in ONE query
+            partial_cypher = """
+                MATCH (n)
+                WHERE (n:Movie OR n:Director OR n:Actor OR n:Genre OR n:Theme OR n:Award)
+                  AND toLower(COALESCE(n.title, n.name)) CONTAINS toLower($name)
+                RETURN COALESCE(n.title, n.name) AS nodeName, labels(n)[0] AS label
+                LIMIT 5
+            """
+            partial_res = session.run(partial_cypher, name=entity_name)
+            for rec in partial_res:
+                matches.append({
+                    "searchTerm": entity_name,
+                    "label": rec["label"],
+                    "nodeName": rec["nodeName"],
+                    "matchType": "partial"
+                })
 
-                # 2. Partial match (CONTAINS)
-                partial_cypher = f"""
-                    MATCH (n:{label})
-                    WHERE toLower(n.{property_name}) CONTAINS toLower($name)
-                    RETURN n.{property_name} AS nodeName, labels(n)[0] AS label
-                    LIMIT 5
-                """
-                partial_res = session.run(partial_cypher, name=entity_name)
-                for rec in partial_res:
-                    matches.append({
-                        "searchTerm": entity_name,
-                        "label": rec["label"],
-                        "nodeName": rec["nodeName"],
-                        "matchType": "partial"
-                    })
     except Exception as e:
         print(f"⚠️ Neo4j query error during entity resolution ({e})")
-
-    exact_matches = [m for m in matches if m["matchType"] == "exact"]
-    if exact_matches:
-        return exact_matches
 
     if matches:
         return matches
 
-    # 3. Fuzzy match fallback using difflib if driver is available
+    # 3. Fuzzy match fallback
     if driver:
         try:
             import difflib
             with driver.session() as session:
-                for node_type in NODE_TYPES:
-                    label = node_type["label"]
-                    property_name = node_type["property"]
-                    res = session.run(f"MATCH (n:{label}) RETURN n.{property_name} AS name LIMIT 200")
-                    all_names = [r["name"] for r in res if r["name"]]
-                    close = difflib.get_close_matches(entity_name, all_names, n=1, cutoff=0.6)
-                    if close:
-                        matches.append({
-                            "searchTerm": entity_name,
-                            "label": label,
-                            "nodeName": close[0],
-                            "matchType": "fuzzy"
-                        })
-                        break
+                # Optimized fuzzy match lookup - only pull 150 total records
+                res = session.run("""
+                    MATCH (n)
+                    WHERE (n:Movie OR n:Director OR n:Actor)
+                    RETURN COALESCE(n.title, n.name) AS name LIMIT 150
+                """)
+                all_names = [r["name"] for r in res if r["name"]]
+                close = difflib.get_close_matches(entity_name, all_names, n=1, cutoff=0.6)
+                if close:
+                    # Very basic fallback, label is guessed
+                    matches.append({
+                        "searchTerm": entity_name,
+                        "label": "Movie/Person",
+                        "nodeName": close[0],
+                        "matchType": "fuzzy"
+                    })
         except Exception as err:
             pass
 
