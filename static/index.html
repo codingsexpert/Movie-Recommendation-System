@@ -22,19 +22,8 @@
 </head>
 <body>
 
-  <!-- Dynamic 10-Color Ambient Glow Background -->
-  <div class="ambient-glow-bg">
-    <div class="glow-orb orb-1"></div>
-    <div class="glow-orb orb-2"></div>
-    <div class="glow-orb orb-3"></div>
-    <div class="glow-orb orb-4"></div>
-    <div class="glow-orb orb-5"></div>
-    <div class="glow-orb orb-6"></div>
-    <div class="glow-orb orb-7"></div>
-    <div class="glow-orb orb-8"></div>
-    <div class="glow-orb orb-9"></div>
-    <div class="glow-orb orb-10"></div>
-  </div>
+  <!-- Ambient Glow Background -->
+  <div class="ambient-glow-bg"></div>
 
   <!-- ═══════════ Glassmorphic Cinema Navbar ═══════════ -->
   <header class="navbar">
@@ -99,7 +88,7 @@
     <div class="spotlight-content">
       <div class="spotlight-badge">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        <span>SPOTLIGHT OF THE DAY</span>
+        <span>FEATURED</span>
       </div>
 
       <h1 class="spotlight-title" id="spotlightTitle">Inception</h1>
@@ -115,20 +104,18 @@
         <span class="spotlight-rating" id="spotlightRating"><svg class="icon-star" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>8.8</span>
       </div>
 
-      <p class="spotlight-desc" id="spotlightDesc">A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O., blurring the lines between reality and the subconscious.</p>
-
       <div class="spotlight-actions">
         <button class="btn-primary" id="spotlightRecommendBtn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>Find Similar Movies</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Similar</span>
         </button>
         <button class="btn-trailer" id="spotlightTrailerBtn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>Watch Trailer</span>
+          <span>Trailer</span>
         </button>
         <button class="btn-secondary" id="spotlightGraphBtn">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-          <span>Explore Graph</span>
+          <span>Graph</span>
         </button>
       </div>
     </div>
@@ -144,10 +131,10 @@
         <div class="section-title-box">
           <div class="sparkles-badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"></path></svg>
-            <span>GRAPH-RAG SEARCH CONSOLE</span>
+            <span>AI SEARCH</span>
           </div>
-          <h2>AI-Powered Movie Search</h2>
-          <p>Ask natural language questions in English or Hinglish — our GraphRAG engine queries the Knowledge Graph & Pinecone vectors.</p>
+          <h2>Discover Movies</h2>
+          <p>Ask anything about movies in English or Hinglish.</p>
         </div>
 
         <div class="search-input-container" style="position: relative; width: 100%;">
@@ -185,11 +172,10 @@
 
         <!-- Quick Prompt Chips -->
         <div class="quick-prompts">
-          <span class="label">Try:</span>
           <button class="prompt-chip" data-query="Recommend movies similar to Inception">Similar to Inception</button>
-          <button class="prompt-chip" data-query="Nolan ki sabse acchi movie konsi hai">Best Nolan (Hinglish)</button>
-          <button class="prompt-chip" data-query="Which movies directed by Christopher Nolan won Oscars?">Nolan Oscar Winners</button>
-          <button class="prompt-chip" data-query="What movies has Leonardo DiCaprio acted in?">DiCaprio Filmography</button>
+          <button class="prompt-chip" data-query="Nolan ki sabse acchi movie konsi hai">Best Nolan</button>
+          <button class="prompt-chip" data-query="Which movies directed by Christopher Nolan won Oscars?">Oscar Winners</button>
+          <button class="prompt-chip" data-query="What movies has Leonardo DiCaprio acted in?">DiCaprio Films</button>
         </div>
       </section>
     </div>
@@ -197,7 +183,7 @@
     <!-- Loading Indicator -->
     <div id="loadingIndicator" class="loading-box hidden">
       <div class="spinner"></div>
-      <p>Executing GraphRAG traversal & vector similarity search...</p>
+      <p>Searching...</p>
     </div>
 
     <!-- AI Recommendation Answer Result Card -->
@@ -247,8 +233,7 @@
     <section class="catalog-section" id="catalogSection">
       <div class="catalog-header">
         <div class="section-title-box">
-          <h2>Movie Catalog</h2>
-          <p>Browse our curated collection of legendary blockbuster films.</p>
+          <h2>Catalog</h2>
         </div>
 
         <!-- Filter Bar -->
@@ -272,7 +257,7 @@
 
   <!-- ═══════════ Footer ═══════════ -->
   <footer class="footer">
-    <p>MovieGraph AI &middot; Built with <a href="https://neo4j.com" target="_blank" rel="noopener">Neo4j</a>, <a href="https://pinecone.io" target="_blank" rel="noopener">Pinecone</a>, and <a href="https://deepmind.google/technologies/gemini/" target="_blank" rel="noopener">Gemini</a> &middot; &copy; 2024</p>
+    <p>MovieGraph AI &middot; &copy; 2024</p>
   </footer>
 
   <!-- ═══════════ Video Trailer Modal Overlay ═══════════ -->

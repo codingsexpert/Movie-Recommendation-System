@@ -455,16 +455,11 @@ body.light-theme .ambient-glow-bg,
 }
 
 .spotlight-desc {
-  font-size: 0.92rem;
-  color: var(--text-tertiary);
-  max-width: 580px;
-  margin-bottom: 1.75rem;
-  line-height: 1.65;
-  font-weight: 400;
+  display: none;
 }
 
 [data-theme="dark"] .spotlight-desc {
-  color: rgba(255,255,255,0.55);
+  display: none;
 }
 
 /* ─── Action Buttons ─── */
