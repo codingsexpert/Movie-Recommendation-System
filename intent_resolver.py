@@ -154,6 +154,8 @@ def resolve_entity(entity_name: str) -> list[dict]:
 
     return matches
 
+from sync_tmdb import fetch_and_insert_movie_by_title
+
 def process_query_intent(query: str) -> tuple[dict, dict]:
     """
     Extracts intent and entities via a single LLM call, resolves entities in Neo4j,
@@ -166,7 +168,7 @@ def process_query_intent(query: str) -> tuple[dict, dict]:
     entity_names = result.get("entities", [])
     print(f"   ✅ Intent: {query_type} | Entities: [{', '.join(entity_names)}]")
 
-    print("   🗄️  Step 2: Resolving entities in Neo4j...")
+    print("   🗄️  Step 2: Resolving entities in Neo4j (and TMDB if needed)...")
     resolved = []
     unresolved = []
 
@@ -177,8 +179,14 @@ def process_query_intent(query: str) -> tuple[dict, dict]:
                 resolved.append(match)
                 print(f"   ✅ \"{name}\" → {match['label']} ({match['nodeName']}) [{match['matchType']}]")
         else:
-            unresolved.append(name)
-            print(f"   ❌ \"{name}\" → not found in graph")
+            print(f"   ❌ \"{name}\" → not found in graph. Attempting TMDB fetch...")
+            tmdb_title = fetch_and_insert_movie_by_title(name)
+            if tmdb_title:
+                print(f"   ✨ TMDB Success: Found & inserted \"{tmdb_title}\"!")
+                resolved.append({"searchTerm": name, "label": "Movie", "nodeName": tmdb_title, "matchType": "tmdb_on_the_fly"})
+            else:
+                unresolved.append(name)
+                print(f"   ❌ \"{name}\" → not found in TMDB either.")
 
     classification = {"type": query_type, "reasoning": "Unified single-pass LLM"}
     resolved_dict = {"query": query, "entities": resolved, "unresolved": unresolved}

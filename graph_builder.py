@@ -91,6 +91,10 @@ def insert_movie_graph(tx, entity: dict):
 
 def build_graph(entities: list[dict]):
     """Build complete graph in Neo4j for ALL movies."""
+    if not driver:
+        print("   ⚠️ Neo4j driver is None. Skipping graph build.")
+        return
+        
     print(f"\n🔨 Building graph for {len(entities)} movies...\n")
 
     # Step 1: Create indexes for fast MERGE
