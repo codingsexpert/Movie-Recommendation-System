@@ -473,59 +473,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ─── HTML Typewriter Streamer (YouTube/ChatGPT Style) ───
   function typeHtml(element, html, speed = 8, callback = null) {
-    element.innerHTML = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-
-    const queue = [];
-
-    function buildQueue(node, parentRef) {
-      if (node.nodeType === Node.TEXT_NODE) {
-        const text = node.nodeValue;
-        if (text) {
-          for (let i = 0; i < text.length; i++) {
-            queue.push({ type: 'char', char: text[i], parentRef: parentRef });
-          }
-        }
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        queue.push({ type: 'start_element', node: node, parentRef: parentRef });
-        for (let child of node.childNodes) {
-          buildQueue(child, node);
-        }
-        queue.push({ type: 'end_element', node: node });
-      }
+    // Write HTML instantly instead of slow typing effect to improve UX speed
+    element.innerHTML = html;
+    
+    // Add simple fade-in effect
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(10px)';
+    element.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    
+    requestAnimationFrame(() => {
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    });
+    
+    if (callback) {
+      setTimeout(callback, 50); // slight delay to allow DOM to paint
     }
-
-    for (let child of tempDiv.childNodes) {
-      buildQueue(child, null);
-    }
-
-    let index = 0;
-
-    function step() {
-      if (index >= queue.length) {
-        if (callback) callback();
-        return;
-      }
-
-      const item = queue[index++];
-
-      if (item.type === 'start_element') {
-        const clone = item.node.cloneNode(false);
-        item.node.targetClone = clone;
-        const parentTarget = item.parentRef && item.parentRef.targetClone ? item.parentRef.targetClone : element;
-        parentTarget.appendChild(clone);
-        step();
-      } else if (item.type === 'end_element') {
-        step();
-      } else if (item.type === 'char') {
-        const parentTarget = item.parentRef && item.parentRef.targetClone ? item.parentRef.targetClone : element;
-        parentTarget.appendChild(document.createTextNode(item.char));
-        setTimeout(step, speed);
-      }
-    }
-
-    step();
   }
 
   // ─── Recommendation Cards Grid ───
