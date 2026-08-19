@@ -765,23 +765,30 @@ body.light-theme .ambient-glow-bg,
   display: flex;
   align-items: center;
   background: var(--bg-input);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 0.5rem 0.6rem 0.5rem 1.3rem;
-  box-shadow: var(--shadow-xs);
-  transition: transform var(--transition-mid), opacity var(--transition-mid), background var(--transition-mid), border-color var(--transition-mid), box-shadow var(--transition-mid);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0.75rem 1.25rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  transition: all var(--transition-mid);
   position: relative;
+  z-index: 100;
 }
 
 .search-box:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-light), var(--shadow-glow);
+  box-shadow: 0 0 0 4px var(--accent-subtle), 0 8px 30px var(--accent-glow);
+  transform: translateY(-1px);
 }
 
 .search-icon {
   color: var(--text-tertiary);
-  margin-right: 0.65rem;
+  margin-right: 0.85rem;
   flex-shrink: 0;
+  transition: color var(--transition-fast);
+}
+
+.search-box:focus-within .search-icon {
+  color: var(--accent);
 }
 
 .search-box input {
@@ -789,12 +796,12 @@ body.light-theme .ambient-glow-bg,
   border: none;
   background: transparent;
   outline: none;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   color: var(--text-primary);
-  font-weight: 400;
+  font-weight: 500;
 }
 
-.search-box input::placeholder { color: var(--text-tertiary); }
+.search-box input::placeholder { color: var(--text-tertiary); font-weight: 400; }
 
 .mic-btn {
   background: transparent;
@@ -819,7 +826,7 @@ body.light-theme .ambient-glow-bg,
   background: linear-gradient(135deg, var(--accent), #6366f1);
   color: #ffffff;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
   padding: 0.72rem 1.6rem;
   font-weight: 700;
   font-size: 0.88rem;
@@ -1564,19 +1571,17 @@ body.light-theme .ambient-glow-bg,
 /* ─── Suggestions Autocomplete Dropdown ─── */
 .suggestions-dropdown {
   position: absolute;
-  top: 105%;
+  top: calc(100% + 12px);
   left: 0;
   right: 0;
-  background: var(--glass-bg);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-md);
-  max-height: 250px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  max-height: 280px;
   overflow-y: auto;
   z-index: 1200;
-  box-shadow: var(--shadow-deep);
-  backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
-  transition: transform var(--transition-fast), opacity var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+  transition: all var(--transition-mid);
 }
 
 .suggestions-dropdown.hidden {
@@ -1584,16 +1589,16 @@ body.light-theme .ambient-glow-bg,
 }
 
 .suggestion-item {
-  padding: 0.8rem 1.3rem;
-  font-size: 0.88rem;
-  font-weight: 600;
+  padding: 0.9rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  transition: transform var(--transition-fast), opacity var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
-  border-bottom: 1.5px solid rgba(59, 130, 246, 0.05);
+  gap: 0.85rem;
+  transition: all var(--transition-fast);
+  border-bottom: 1px solid var(--border);
 }
 
 .suggestion-item:last-child {
