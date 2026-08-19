@@ -578,6 +578,18 @@ def get_movie_poster(title: str):
 
 from cache_manager import get_cached_response, set_cached_response, generate_cache_key
 from intent_resolver import process_query_intent
+@app.get("/api/related/{title}")
+async def get_related_movies(title: str):
+    from similarity_handler import get_similar_movies
+    try:
+        similar = get_similar_movies(title, limit=6)
+        if similar:
+            return {"movies": [m['title'] for m in similar]}
+        return {"movies": []}
+    except Exception as e:
+        logger.error(f"Error fetching related movies for {title}: {e}")
+        return {"movies": []}
+
 
 @app.post("/api/query")
 async def process_rag_query(req: QueryRequest):

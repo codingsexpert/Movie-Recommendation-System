@@ -350,10 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <h3 class="poster-movie-title">${movie.title}</h3>
             <div class="poster-meta">${yearText}${genresText ? ' · ' + genresText : ''}</div>
             <div class="poster-actions">
-              <button class="poster-btn poster-btn-primary poster-btn-cta" data-action="recommend" data-title="${movie.title}" title="Find Similar">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                Similar
-              </button>
+
               <button class="poster-btn poster-btn-red poster-btn-icon" data-action="trailer" data-title="${movie.title}" title="Watch Trailer">
                 <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
               </button>
@@ -382,11 +379,10 @@ document.addEventListener('DOMContentLoaded', () => {
         card.classList.add('loading-active');
 
         try {
-          const payload = { query: `Recommend movies similar to ${movie.title}` };
-          const response = await fetch('/api/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+          const response = await fetch(`/api/related/${encodeURIComponent(movie.title)}`);
           if (!response.ok) throw new Error('API failed');
           const data = await response.json();
-          const titles = extractMovieTitles(data.answer);
+          const titles = data.movies || [];
 
           card.classList.remove('loading-active');
           if (!titles || titles.length === 0) return;
@@ -436,13 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // Event delegation
-      card.querySelector('[data-action="recommend"]').addEventListener('click', (e) => {
-        e.stopPropagation();
-        const q = `Recommend movies similar to ${movie.title}`;
-        queryInput.value = q;
-        executeSearch(q);
-      });
+
 
       card.querySelector('[data-action="trailer"]').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -666,10 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <h3 class="poster-movie-title">${movie.title}</h3>
             <div class="poster-meta">${yearText}${yearText && genresText ? ' · ' : ''}${genresText}</div>
             <div class="poster-actions">
-              <button class="poster-btn poster-btn-primary poster-btn-cta" data-action="recommend" data-title="${movie.title}" title="Find Similar">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                Similar
-              </button>
+
               ${movie.trailer ? `
               <button class="poster-btn poster-btn-red poster-btn-icon" data-action="trailer" data-title="${movie.title}" title="Watch Trailer">
                 <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
@@ -701,11 +688,10 @@ document.addEventListener('DOMContentLoaded', () => {
         card.classList.add('loading-active');
 
         try {
-          const payload = { query: `Recommend movies similar to ${movie.title}` };
-          const response = await fetch('/api/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+          const response = await fetch(`/api/related/${encodeURIComponent(movie.title)}`);
           if (!response.ok) throw new Error('API failed');
           const data = await response.json();
-          const titles = extractMovieTitles(data.answer);
+          const titles = data.movies || [];
 
           card.classList.remove('loading-active');
           if (!titles || titles.length === 0) return;
@@ -756,12 +742,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // 2. Button Handlers
-      card.querySelector('[data-action="recommend"]').addEventListener('click', (e) => {
-        e.stopPropagation();
-        const q = `Recommend movies similar to ${movie.title}`;
-        queryInput.value = q;
-        executeSearch(q);
-      });
 
       if (movie.trailer) {
         card.querySelector('[data-action="trailer"]').addEventListener('click', (e) => {
