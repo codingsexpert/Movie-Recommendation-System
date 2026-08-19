@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let heroInterval;
   function setupHeroCarousel(movies) {
     if(!movies || movies.length === 0) return;
-    const heroMovies = movies.filter(m => m.vote_average > 8.0).slice(0, 5);
+    const heroMovies = movies.filter(m => parseFloat(m.rating || 0) >= 8.0).slice(0, 5);
     if(heroMovies.length === 0) return;
     
     let idx = 0;
@@ -100,23 +100,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderHero(movie) {
-    const bgUrl = movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : (movie.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80');
+    const bgUrl = movie.backdrop || movie.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80';
     
     heroCarousel.innerHTML = `
       <div class="hotstar-hero carousel-slide" style="background-image: url('${bgUrl}');">
         <div class="hotstar-content">
           <h1 class="hotstar-title">${movie.title}</h1>
           <div class="hotstar-meta">
-            <span class="imdb">IMDb ${movie.vote_average || '8.5'}</span>
+            <span class="imdb">IMDb ${movie.rating || '8.5'}</span>
             <span>•</span>
-            <span>${movie.release_year || '2023'}</span>
+            <span>${movie.year || '2023'}</span>
             <span>•</span>
             <span>U/A 16+</span>
           </div>
           <p class="hotstar-overview">${movie.overview || 'A captivating cinematic experience.'}</p>
           <div class="hotstar-genres">${(movie.genres || ['Action', 'Drama']).join(' • ')}</div>
           <div class="hotstar-actions">
-            <button class="hotstar-btn-play" onclick="openTrailer('${movie.trailer_url || ''}')">
+            <button class="hotstar-btn-play" onclick="openTrailer('${movie.trailer || ''}')">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
               Subscribe to Watch
             </button>
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     panel.className = 'hotstar-panel';
     currentActivePanel = panel;
 
-    const bgUrl = movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : (movie.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80');
+    const bgUrl = movie.backdrop || movie.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80';
 
     panel.innerHTML = `
       <div class="hotstar-hero" style="background-image: url('${bgUrl}'); min-height: 400px;">
@@ -167,14 +167,14 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="hotstar-content" style="width: 70%; padding: 2rem;">
           <h2 class="hotstar-title" style="font-size: 2.5rem;">${movie.title}</h2>
           <div class="hotstar-meta">
-            <span class="imdb">IMDb ${movie.vote_average || 'N/A'}</span>
+            <span class="imdb">IMDb ${movie.rating || 'N/A'}</span>
             <span>•</span>
-            <span>${movie.release_year || 'Unknown'}</span>
+            <span>${movie.year || 'Unknown'}</span>
           </div>
           <p class="hotstar-overview" style="-webkit-line-clamp: 2;">${movie.overview || 'No description available.'}</p>
           <div class="hotstar-genres">${(movie.genres || []).join(' • ')}</div>
           <div class="hotstar-actions">
-            <button class="hotstar-btn-play" onclick="openTrailer('${movie.trailer_url || ''}')">
+            <button class="hotstar-btn-play" onclick="openTrailer('${movie.trailer || ''}')">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
               Play Trailer
             </button>
