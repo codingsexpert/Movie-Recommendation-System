@@ -377,14 +377,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.inline-related-panel').forEach(p => p.remove());
         document.querySelectorAll('.movie-card.active-card').forEach(c => c.classList.remove('active-card'));
+        document.querySelectorAll('.movie-card.loading-active').forEach(c => c.classList.remove('loading-active'));
         
-        card.classList.add('active-card');
-        const panel = document.createElement('div');
-        panel.className = 'inline-related-panel';
-        panel.innerHTML = `<div class="spinner" style="margin: 2rem auto;"></div><p style="text-align: center; color: var(--text-secondary);">Finding related movies for ${movie.title}...</p>`;
-        
-        card.parentNode.insertBefore(panel, card.nextSibling);
-        setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+        card.classList.add('loading-active');
 
         try {
           const payload = { query: `Recommend movies similar to ${movie.title}` };
@@ -393,11 +388,13 @@ document.addEventListener('DOMContentLoaded', () => {
           const data = await response.json();
           const titles = extractMovieTitles(data.answer);
 
-          if (!titles || titles.length === 0) {
-            panel.innerHTML = `<p style="text-align:center; padding: 2rem; color:var(--text-secondary);">No related movies found.</p>`;
-            return;
-          }
+          card.classList.remove('loading-active');
+          if (!titles || titles.length === 0) return;
 
+          card.classList.add('active-card');
+          const panel = document.createElement('div');
+          panel.className = 'inline-related-panel';
+          
           const miniGrid = document.createElement('div');
           miniGrid.className = 'mini-grid';
           titles.forEach(t => {
@@ -425,13 +422,17 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           `;
           panel.appendChild(miniGrid);
+          
+          card.parentNode.insertBefore(panel, card.nextSibling);
+          setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+
           panel.querySelector('#closePanelBtn').addEventListener('click', (ev) => {
             ev.stopPropagation();
             panel.remove();
             card.classList.remove('active-card');
           });
         } catch (err) {
-          panel.innerHTML = `<p style="text-align:center; padding: 2rem; color:var(--red);">Failed to load related movies.</p>`;
+          card.classList.remove('loading-active');
         }
       });
 
@@ -695,14 +696,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.inline-related-panel').forEach(p => p.remove());
         document.querySelectorAll('.movie-card.active-card').forEach(c => c.classList.remove('active-card'));
+        document.querySelectorAll('.movie-card.loading-active').forEach(c => c.classList.remove('loading-active'));
         
-        card.classList.add('active-card');
-        const panel = document.createElement('div');
-        panel.className = 'inline-related-panel';
-        panel.innerHTML = `<div class="spinner" style="margin: 2rem auto;"></div><p style="text-align: center; color: var(--text-secondary);">Finding related movies for ${movie.title}...</p>`;
-        
-        card.parentNode.insertBefore(panel, card.nextSibling);
-        setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+        card.classList.add('loading-active');
 
         try {
           const payload = { query: `Recommend movies similar to ${movie.title}` };
@@ -711,11 +707,13 @@ document.addEventListener('DOMContentLoaded', () => {
           const data = await response.json();
           const titles = extractMovieTitles(data.answer);
 
-          if (!titles || titles.length === 0) {
-            panel.innerHTML = `<p style="text-align:center; padding: 2rem; color:var(--text-secondary);">No related movies found.</p>`;
-            return;
-          }
+          card.classList.remove('loading-active');
+          if (!titles || titles.length === 0) return;
 
+          card.classList.add('active-card');
+          const panel = document.createElement('div');
+          panel.className = 'inline-related-panel';
+          
           const miniGrid = document.createElement('div');
           miniGrid.className = 'mini-grid';
           titles.forEach(t => {
@@ -743,13 +741,17 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           `;
           panel.appendChild(miniGrid);
+          
+          card.parentNode.insertBefore(panel, card.nextSibling);
+          setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+
           panel.querySelector('#closePanelBtn').addEventListener('click', (ev) => {
             ev.stopPropagation();
             panel.remove();
             card.classList.remove('active-card');
           });
         } catch (err) {
-          panel.innerHTML = `<p style="text-align:center; padding: 2rem; color:var(--red);">Failed to load related movies.</p>`;
+          card.classList.remove('loading-active');
         }
       });
 
