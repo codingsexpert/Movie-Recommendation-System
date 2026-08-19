@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       card.innerHTML = `
         <div class="poster-wrap">
-          <img src="${posterUrl}" alt="${movie.title}" loading="lazy" onerror="handleImageLoadError(this, '${movie.title.replace(/'/g, "\\'")}')" />
+          <img src="${posterUrl}" alt="${movie.title}" loading="lazy" onload="this.classList.add('poster-loaded');" onerror="handleImageLoadError(this, '${movie.title.replace(/'/g, "\\'")}')" />
           <div class="poster-gradient"></div>
 
           ${ratingText ? `<div class="poster-rating">${ratingText}</div>` : ''}
@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         const posterUrl = movie.poster || 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg';
         const escapedTitle = movie.title.replace(/'/g, "\\'");
-        posterHtml = `<img src="${posterUrl}" alt="${movie.title}" loading="lazy" onerror="handleImageLoadError(this, '${escapedTitle}')" />`;
+        posterHtml = `<img src="${posterUrl}" alt="${movie.title}" loading="lazy" onload="this.classList.add('poster-loaded');" onerror="handleImageLoadError(this, '${escapedTitle}')" />`;
       }
 
       card.innerHTML = `
@@ -663,4 +663,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // ─── Nav Links ───
   document.querySelectorAll('.nav-link').forEach(l => { l.addEventListener('click', () => { document.querySelectorAll('.nav-link').forEach(x => x.classList.remove('active')); l.classList.add('active'); }); });
 
+  // Sync TMDB Button
+  const syncTmdbBtn = document.getElementById('syncTmdbBtn');
+  if (syncTmdbBtn) {
+    syncTmdbBtn.addEventListener('click', async () => {
+      syncTmdbBtn.innerHTML = '<span class="loading-spinner"></span> Syncing...';
+      syncTmdbBtn.disabled = true;
+      try {
+        const res = await fetch('/api/sync_tmdb', { method: 'POST' });
+        const data = await res.json();
+        if (data.status === 'success') {
+          alert('TMDB Sync started in the background! Trending movies are being added.');
+        } else {
+          alert('Failed to sync TMDB.');
+        }
+      } catch (err) {
+        alert('Error triggering sync.');
+      } finally {
+        syncTmdbBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M21.5 2v6h-6M2.13 15.57a9 9 0 1 0 3.32-8.3L2 9M2.5 22v-6h6M21.87 8.43a9 9 0 1 0-3.32 8.3L22 15"></path></svg> Sync Trending';
+        syncTmdbBtn.disabled = false;
+      }
+    });
+  }
 });

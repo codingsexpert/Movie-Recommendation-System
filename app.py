@@ -7,8 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from config import driver, pinecone_index
-from entity_resolver import resolve_query_entities
-from query_classifier import classify_query
 from graph_handler import handle_graph_query
 from similarity_handler import handle_similarity_query
 from run_indexing import run_indexing
@@ -544,10 +542,22 @@ def upload_and_index_pdf(background_tasks: BackgroundTasks, file: UploadFile = F
         "file_path": file_path
     }
 
+from sync_tmdb import fetch_trending_movies
+
+@app.post("/api/sync_tmdb")
+def sync_tmdb_endpoint(background_tasks: BackgroundTasks):
+    """Trigger background sync of TMDB trending movies."""
+    background_tasks.add_task(fetch_trending_movies)
+    return {
+        "status": "success",
+        "message": "TMDB sync launched in background. Trending movies will be added to the Knowledge Graph."
+    }
+
 from cache_manager import get_cached_response, set_cached_response, generate_cache_key
+from intent_resolver import process_query_intent
 
 @app.post("/api/query")
-def process_rag_query(req: QueryRequest):
+async def process_rag_query(req: QueryRequest):
     """Execute GraphRAG Pipeline and return step-by-step resolution & output."""
     query = req.query.strip()
     if not query:
@@ -561,40 +571,49 @@ def process_rag_query(req: QueryRequest):
         return cached_data
 
     try:
-        resolved = resolve_query_entities(query)
-        classification = classify_query(query, resolved)
+        # Phase 1 Unified Call (Halves Latency & Cost)
+        classification, resolved = process_query_intent(query)
+        
         query_type = classification.get("type", "graph")
         reasoning = classification.get("reasoning", "")
 
-        if query_type == "similarity":
-            answer = handle_similarity_query(query, resolved, req.userId)
-        else:
-            answer = handle_graph_query(query, resolved)
+        print(f"\n--- Processing Query: '{query}' ---")
+        print(f"   🤖 Intent: {query_type.upper()} ({reasoning})")
 
+        # 3. Route to specific handler
+        if query_type == "graph":
+            answer = await handle_graph_query(query, resolved)
+        else:
+            answer = await handle_similarity_query(query, resolved, user_id=req.userId)
+
+        # 4. Fallback formatting if empty
+        if not answer:
+            answer = "I couldn't find an answer to that right now. Try rephrasing!"
+
+        # 5. Format Output
         response_data = {
             "query": query,
-            "resolved": resolved,
-            "classification": {
-                "type": query_type,
-                "reasoning": reasoning
-            },
+            "classification": classification,
+            "resolved_entities": resolved,
             "answer": answer
         }
 
-        # 2. Save to Cache
-        set_cached_response(cache_key, response_data, ttl_seconds=3600)
+        # 6. Cache the successful result
+        set_cached_response(cache_key, response_data)
+
         return response_data
 
     except Exception as e:
         err_msg = str(e)
+        import traceback
+        traceback.print_exc()
         if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg:
-            user_answer = "**[Warning]** **API Rate Limit Exceeded**: Gemini LLM free tier quota reached for the minute. Please wait 10-15 seconds and click **Execute Query** again."
+            user_answer = "**[Warning]** **API Rate Limit Exceeded**: Gemini LLM free tier quota reached. Please wait."
         else:
             user_answer = f"**[Error]** An error occurred processing your request: {err_msg}"
-
         return {
             "query": query,
-            "resolved": {"query": query, "entities": [], "unresolved": []},
+            "resolved_entities": {"query": query, "entities": [], "unresolved": []},
             "classification": {"type": "graph", "reasoning": "Error fallback"},
             "answer": user_answer
         }

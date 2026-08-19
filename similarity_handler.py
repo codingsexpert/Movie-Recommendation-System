@@ -1,5 +1,5 @@
 import re
-from config import llm, embed_text, pinecone_index, driver
+from config import llm, embed_text, pinecone_index, async_driver
 
 def extract_title_from_chunk(chunk_text: str) -> str | None:
     """Extract movie title from a raw chunk text with multiple fallback regex patterns."""
@@ -14,13 +14,13 @@ def extract_title_from_chunk(chunk_text: str) -> str | None:
         return first_line_clean
     return None
 
-def get_movie_genres(movie_title: str) -> list[str]:
+async def get_movie_genres(movie_title: str) -> list[str]:
     """Neo4j: Get genres of a specific movie."""
-    if not driver:
+    if not async_driver:
         return []
     try:
-        with driver.session() as session:
-            result = session.run(
+        async with async_driver.session() as session:
+            result = await session.run(
                 """
                 MATCH (m:Movie)-[:BELONGS_TO]->(g:Genre)
                 WHERE toLower(m.title) = toLower($title)
@@ -28,18 +28,18 @@ def get_movie_genres(movie_title: str) -> list[str]:
                 """,
                 title=movie_title
             )
-            return [r["genre"] for r in result]
+            return [r["genre"] async for r in result]
     except Exception as e:
         print(f"⚠️ Neo4j error in get_movie_genres: {e}")
         return []
 
-def get_movie_themes(movie_title: str) -> list[str]:
+async def get_movie_themes(movie_title: str) -> list[str]:
     """Neo4j: Get themes of a specific movie."""
-    if not driver:
+    if not async_driver:
         return []
     try:
-        with driver.session() as session:
-            result = session.run(
+        async with async_driver.session() as session:
+            result = await session.run(
                 """
                 MATCH (m:Movie)-[:EXPLORES]->(t:Theme)
                 WHERE toLower(m.title) = toLower($title)
@@ -47,18 +47,18 @@ def get_movie_themes(movie_title: str) -> list[str]:
                 """,
                 title=movie_title
             )
-            return [r["theme"] for r in result]
+            return [r["theme"] async for r in result]
     except Exception as e:
         print(f"⚠️ Neo4j error in get_movie_themes: {e}")
         return []
 
-def filter_by_genre(movie_titles: list[str], source_genres: list[str]) -> list[dict]:
+async def filter_by_genre(movie_titles: list[str], source_genres: list[str]) -> list[dict]:
     """Neo4j: Filter candidate movies sharing at least one genre with source movie."""
-    if not driver or not movie_titles or not source_genres:
+    if not async_driver or not movie_titles or not source_genres:
         return []
     try:
-        with driver.session() as session:
-            result = session.run(
+        async with async_driver.session() as session:
+            result = await session.run(
                 """
                 MATCH (m:Movie)-[:BELONGS_TO]->(g:Genre)
                 WHERE m.title IN $titles
@@ -68,39 +68,39 @@ def filter_by_genre(movie_titles: list[str], source_genres: list[str]) -> list[d
                 """,
                 titles=movie_titles, sourceGenres=source_genres
             )
-            return [{"title": r["title"], "genres": r["genres"]} for r in result]
+            return [{"title": r["title"], "genres": r["genres"]} async for r in result]
     except Exception as e:
         print(f"⚠️ Neo4j error in filter_by_genre: {e}")
         return []
 
-def get_user_profile(user_id: str) -> dict:
+async def get_user_profile(user_id: str) -> dict:
     """Fetch top genres and directors a user has interacted with."""
-    if not driver or not user_id:
+    if not async_driver or not user_id:
         return {"genres": [], "directors": []}
     try:
-        with driver.session() as session:
+        async with async_driver.session() as session:
             # Top 3 Genres
-            genre_res = session.run("""
+            genre_res = await session.run("""
                 MATCH (u:User {id: $userId})-[r:INTERACTED_WITH]->(m:Movie)-[:BELONGS_TO]->(g:Genre)
                 RETURN g.name AS genre, sum(r.count) AS score
                 ORDER BY score DESC LIMIT 3
             """, userId=user_id)
-            top_genres = [rec["genre"] for rec in genre_res]
+            top_genres = [rec["genre"] async for rec in genre_res]
 
             # Top 3 Directors
-            dir_res = session.run("""
+            dir_res = await session.run("""
                 MATCH (u:User {id: $userId})-[r:INTERACTED_WITH]->(m:Movie)<-[:DIRECTED]-(d:Director)
                 RETURN d.name AS director, sum(r.count) AS score
                 ORDER BY score DESC LIMIT 3
             """, userId=user_id)
-            top_dirs = [rec["director"] for rec in dir_res]
+            top_dirs = [rec["director"] async for rec in dir_res]
             
             return {"genres": top_genres, "directors": top_dirs}
     except Exception as e:
         print(f"⚠️ Neo4j user profile error: {e}")
         return {"genres": [], "directors": []}
 
-def fallback_vector_search(query: str, user_id: str = None) -> str:
+async def fallback_vector_search(query: str, user_id: str = None) -> str:
     """Fallback: Pure vector search when no specific movie entity is resolved."""
     print("   📐 Fallback: Pure vector search...")
     query_vector = embed_text(query)
@@ -132,7 +132,10 @@ Do NOT mention databases, vectors, or technical terms.
 Format as a numbered list."""
 
     try:
-        response = llm.invoke([
+        # Note: llm.invoke is blocking, we could use ainvoke if supported, 
+        # but for simplicity we keep it as invoke in this context, or await if supported.
+        # langchain_google_genai supports ainvoke
+        response = await llm.ainvoke([
             {"role": "system", "content": "You are a movie recommendation expert. Respond ONLY with a numbered list of movie recommendations with short explanations. Never respond with JSON."},
             {"role": "user", "content": prompt}
         ])
@@ -150,20 +153,20 @@ Format as a numbered list."""
             res_lines.append(f"{idx}. **{title}**\n   - **Overview:** {clean_text}...")
         return "\n\n".join(res_lines)
 
-def handle_similarity_query(query: str, resolved_entities: dict, user_id: str = None) -> str:
+async def handle_similarity_query(query: str, resolved_entities: dict, user_id: str = None) -> str:
     """Main similarity handler: Pinecone + Neo4j + LLM + Personalization."""
     entities = resolved_entities.get("entities", [])
     movie_entity = next((e for e in entities if e["label"] == "Movie"), None)
 
     if not movie_entity:
         print("   ⚠️ No movie entity resolved. Falling back to vector search...")
-        return fallback_vector_search(query, user_id)
+        return await fallback_vector_search(query, user_id)
 
     movie_name = movie_entity["nodeName"]
     print(f"   🎬 Finding movies similar to: \"{movie_name}\"")
 
     # Fetch User Profile
-    user_profile = get_user_profile(user_id)
+    user_profile = await get_user_profile(user_id)
     profile_context = ""
     if user_profile["genres"] or user_profile["directors"]:
         profile_context = f"\nPERSONALIZATION:\nThis user usually likes Genres: {', '.join(user_profile['genres'])} and Directors: {', '.join(user_profile['directors'])}.\nGive a slight boost to movies matching this taste if applicable.\n"
@@ -186,14 +189,14 @@ def handle_similarity_query(query: str, resolved_entities: dict, user_id: str = 
 
     # Step 3: Get genres & themes from Neo4j
     print("   🗄️  Getting source movie genres from Neo4j...")
-    source_genres = get_movie_genres(movie_name)
-    source_themes = get_movie_themes(movie_name)
+    source_genres = await get_movie_genres(movie_name)
+    source_themes = await get_movie_themes(movie_name)
     print(f"   ✅ Genres: [{', '.join(source_genres)}]")
     print(f"   ✅ Themes: [{', '.join(source_themes)}]")
 
     if not source_genres:
         print(f"   ⚠️ No genres found for \"{movie_name}\". Using vector results only.")
-        return fallback_vector_search(query, user_id)
+        return await fallback_vector_search(query, user_id)
 
     # Step 4: Extract titles from top 50 chunks
     candidate_titles = []
@@ -211,7 +214,7 @@ def handle_similarity_query(query: str, resolved_entities: dict, user_id: str = 
 
     # Step 5: Filter by genre match in Neo4j
     print("   🗄️  Filtering by genre in Neo4j...")
-    genre_matched = filter_by_genre(candidate_titles, source_genres)
+    genre_matched = await filter_by_genre(candidate_titles, source_genres)
     print(f"   ✅ {len(genre_matched)} movies share at least one genre")
 
     if not genre_matched:
@@ -250,7 +253,7 @@ Do NOT mention databases, vectors, scores, or technical terms.
 Format as a numbered list."""
 
     try:
-        response = llm.invoke([
+        response = await llm.ainvoke([
             {"role": "system", "content": "You are a movie recommendation expert. Respond ONLY with a numbered list of movie recommendations with short explanations. Never respond with JSON."},
             {"role": "user", "content": prompt}
         ])

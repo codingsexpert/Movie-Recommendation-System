@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from config import driver
+from config import async_driver
 import time
 
 router = APIRouter()
@@ -12,19 +12,19 @@ class TrackEventRequest(BaseModel):
     targetName: str # e.g. "Inception" or query string
 
 @router.post("/api/track")
-def track_user_event(req: TrackEventRequest):
+async def track_user_event(req: TrackEventRequest):
     """Log a user action to Neo4j to build a personalization profile."""
-    if not driver:
+    if not async_driver:
         return {"status": "ignored", "reason": "No DB connection"}
     
     try:
-        with driver.session() as session:
+        async with async_driver.session() as session:
             # Ensure User node exists
-            session.run("MERGE (u:User {id: $userId})", userId=req.userId)
+            await session.run("MERGE (u:User {id: $userId})", userId=req.userId)
 
             if req.eventType == "movie_click" or req.eventType == "similar_click":
                 # Link User to Movie they viewed/interacted with
-                session.run("""
+                await session.run("""
                     MATCH (u:User {id: $userId})
                     MATCH (m:Movie) WHERE toLower(m.title) = toLower($targetName)
                     MERGE (u)-[r:INTERACTED_WITH]->(m)
@@ -34,7 +34,7 @@ def track_user_event(req: TrackEventRequest):
                 
             elif req.eventType == "search":
                 # Link User to Search Query
-                session.run("""
+                await session.run("""
                     MATCH (u:User {id: $userId})
                     MERGE (q:SearchQuery {query: $targetName})
                     MERGE (u)-[r:SEARCHED]->(q)

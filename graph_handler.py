@@ -1,9 +1,9 @@
 import json
 import re
-from config import driver, llm
+from config import async_driver, llm
 from cypher_templates import build_cypher
 
-def create_query_plan(query: str, resolved_entities: dict) -> dict:
+async def create_query_plan(query: str, resolved_entities: dict) -> dict:
     """Create query plan using LLM with resolved entity context."""
     entities = resolved_entities.get("entities", [])
     unresolved = resolved_entities.get("unresolved", [])
@@ -90,7 +90,7 @@ EXAMPLES:
   {{"type":"aggregation","function":"count","field":"Movie.title","alias":"total_scifi_movies"}}
 ]}}"""
 
-    response = llm.invoke([
+    response = await llm.ainvoke([
         {"role": "system", "content": prompt},
         {"role": "user", "content": query}
     ])
@@ -108,11 +108,11 @@ EXAMPLES:
         print("❌ Failed to parse plan:", raw[:300])
         raise RuntimeError("Query planning failed. Please rephrase your question.")
 
-def execute_describe(label: str, name: str) -> list[dict]:
+async def execute_describe(label: str, name: str) -> list[dict]:
     """Fetch ALL relationships around an entity."""
-    if not driver:
+    if not async_driver:
         return [{"error": "Neo4j database not connected"}]
-    with driver.session() as session:
+    async with async_driver.session() as session:
         params = {"name": name}
 
         if label == "Movie":
@@ -186,13 +186,13 @@ def execute_describe(label: str, name: str) -> list[dict]:
             return [{"error": f"Unknown label: {label}"}]
 
         print(f"   🔒 Describe Cypher: {' '.join(cypher.split())}")
-        result = session.run(cypher, params)
-        records = [dict(record) for record in result]
+        result = await session.run(cypher, params)
+        records = [dict(record) async for record in result]
         return records
 
-def execute_path(from_label: str, from_name: str, to_label: str, to_name: str) -> list[dict]:
+async def execute_path(from_label: str, from_name: str, to_label: str, to_name: str) -> list[dict]:
     """Find shortest path between two entities in Neo4j graph."""
-    if not driver:
+    if not async_driver:
         return [{"error": "Neo4j database not connected"}]
     from_prop = "title" if from_label == "Movie" else "name"
     to_prop = "title" if to_label == "Movie" else "name"
@@ -211,33 +211,33 @@ def execute_path(from_label: str, from_name: str, to_label: str, to_name: str) -
 
     print(f"   🔒 Path Cypher: {' '.join(cypher.split())}")
 
-    with driver.session() as session:
-        result = session.run(cypher, fromName=from_name, toName=to_name)
-        records = [dict(record) for record in result]
+    async with async_driver.session() as session:
+        result = await session.run(cypher, fromName=from_name, toName=to_name)
+        records = [dict(record) async for record in result]
         if not records:
             return [{"error": f"No connection found between {from_name} and {to_name}"}]
         return records
 
-def execute_template_cypher(plan: dict) -> list[dict]:
+async def execute_template_cypher(plan: dict) -> list[dict]:
     """Execute template-based safe Cypher query."""
-    if not driver:
+    if not async_driver:
         return [{"error": "Neo4j database not connected"}]
     cypher, params = build_cypher(plan)
     print(f"   🔒 Cypher:\n{cypher}")
     print(f"   🔒 Params: {params}")
 
-    with driver.session() as session:
-        result = session.run(cypher, params)
-        records = [dict(record) for record in result]
+    async with async_driver.session() as session:
+        result = await session.run(cypher, params)
+        records = [dict(record) async for record in result]
         return records
 
 
-def handle_graph_query(query: str, resolved_entities: dict) -> str:
+async def handle_graph_query(query: str, resolved_entities: dict) -> str:
     """Main graph query handler with robust fallback."""
     records = []
     try:
         print("   📋 Creating query plan...")
-        plan = create_query_plan(query, resolved_entities)
+        plan = await create_query_plan(query, resolved_entities)
         print("   📋 Plan:", json.dumps(plan, indent=2))
 
         steps = plan.get("steps", [])
@@ -247,16 +247,16 @@ def handle_graph_query(query: str, resolved_entities: dict) -> str:
 
             if step_type == "describe":
                 print(f"   🗄️  Describing {first_step['label']}: \"{first_step['name']}\"...")
-                records = execute_describe(first_step["label"], first_step["name"])
+                records = await execute_describe(first_step["label"], first_step["name"])
             elif step_type == "path":
                 print(f"   🗄️  Finding path: {first_step['fromName']} → {first_step['toName']}...")
-                records = execute_path(
+                records = await execute_path(
                     first_step["fromLabel"], first_step["fromName"],
                     first_step["toLabel"], first_step["toName"]
                 )
             else:
                 print("   🗄️  Querying Neo4j...")
-                records = execute_template_cypher(plan)
+                records = await execute_template_cypher(plan)
     except Exception as err:
         print(f"⚠️ Graph plan execution error: {err}")
 
@@ -264,7 +264,7 @@ def handle_graph_query(query: str, resolved_entities: dict) -> str:
     if not records or (isinstance(records, list) and len(records) > 0 and isinstance(records[0], dict) and records[0].get("error")):
         print("   📐 Graph plan produced no records. Falling back to vector similarity handler...")
         from similarity_handler import handle_similarity_query
-        return handle_similarity_query(query, resolved_entities)
+        return await handle_similarity_query(query, resolved_entities)
 
     print(f"   🗄️  Got {len(records)} results")
 
@@ -280,7 +280,7 @@ Database Results:
 {f'\n... and {len(records) - 50} more results' if len(records) > 50 else ''}"""
 
     try:
-        response = llm.invoke([
+        response = await llm.ainvoke([
             {"role": "system", "content": "You are a helpful movie assistant. Respond ONLY in plain English text. Never respond with JSON or code."},
             {"role": "user", "content": response_prompt}
         ])
@@ -292,4 +292,4 @@ Database Results:
     except Exception as e:
         print(f"⚠️ LLM response error: {e}")
         from similarity_handler import fallback_vector_search
-        return fallback_vector_search(query)
+        return await fallback_vector_search(query)
