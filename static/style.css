@@ -1515,13 +1515,14 @@ body.light-theme .ambient-glow-bg,
   .poster-btn-icon svg { width: 12px; height: 12px; }
   .catalog-header { flex-direction: column; align-items: flex-start; }
   .trailer-modal-content { width: 96%; padding: 1rem; }
+  .results-card, .graph-card { padding: 1.5rem; margin-bottom: 1.5rem; }
 }
 
 @media (max-width: 480px) {
   .spotlight-title { font-size: 1.5rem; }
   .spotlight-meta { font-size: 0.7rem; }
   .spotlight-actions { flex-wrap: wrap; }
-  .movie-grid { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+  .movie-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
   .poster-movie-title { font-size: 0.72rem; }
   .poster-info { padding: 0 0.5rem 0.45rem; }
   .poster-meta { font-size: 0.58rem; }
@@ -1531,6 +1532,8 @@ body.light-theme .ambient-glow-bg,
   .poster-btn-icon { width: 26px; height: 26px; }
   .poster-btn-icon svg { width: 11px; height: 11px; }
   .brand-title h1 { font-size: 1.05rem; }
+  .results-card, .graph-card { padding: 1rem; margin-bottom: 1rem; }
+  .hero-search-wrapper .search-box input { font-size: 0.9rem; padding: 0.85rem 1rem 0.85rem 2.8rem; }
 }
 
 /* ─── Scrollbar ─── */
