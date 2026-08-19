@@ -64,8 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const spotlightRating   = document.getElementById('spotlightRating');
 
   // ─── Autocomplete suggestions logic ───
+  let searchTimeout = null;
   queryInput.addEventListener('input', () => {
-    const val = queryInput.value;
+    if (searchTimeout) clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      const val = queryInput.value;
     if (!val || val.length < 2) {
       suggestionsDropdown.classList.add('hidden');
       return;
@@ -114,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       suggestionsDropdown.appendChild(div);
     });
+    }, 200); // 200ms debounce
   });
 
   // Hide dropdown on click outside
