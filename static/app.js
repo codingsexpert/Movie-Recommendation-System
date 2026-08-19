@@ -555,13 +555,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (movie) {
         matchedMovies.push(movie);
       } else {
-        // Fallback placeholder card if the movie is not in allCatalogMovies
+        // Fetch dynamically from API instead of placeholder
         matchedMovies.push({
           title: title,
           year: '',
           rating: '',
-          isPlaceholder: true,
           genres: ['Recommendation'],
+          poster: `/api/poster?title=${encodeURIComponent(title)}`,
           trailer: null
         });
       }
@@ -576,19 +576,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const genresText = (movie.genres || []).slice(0, 3).join(' · ');
       const yearText = movie.year || '';
 
-      let posterHtml = '';
-      if (movie.isPlaceholder) {
-        posterHtml = `
-          <div class="placeholder-poster-gradient" style="width:100%; height:100%; background: linear-gradient(135deg, #1e293b, #0b0f1a); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; text-align:center; border: 1px solid var(--border);">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px; filter: drop-shadow(0 2px 8px var(--accent-glow));"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"></path></svg>
-            <span style="font-family:'Outfit', sans-serif; font-size:1.05rem; font-weight:800; color:#ffffff; line-height:1.3; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; text-shadow:0 2px 4px rgba(0,0,0,0.5);">${movie.title}</span>
-          </div>
-        `;
-      } else {
-        const posterUrl = movie.poster || 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg';
-        const escapedTitle = movie.title.replace(/'/g, "\\'");
-        posterHtml = `<img src="${posterUrl}" alt="${movie.title}" loading="lazy" onload="this.classList.add('poster-loaded');" onerror="handleImageLoadError(this, '${escapedTitle}')" />`;
-      }
+      const posterUrl = movie.poster || 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg';
+      const escapedTitle = movie.title.replace(/'/g, "\\'");
+      const posterHtml = `<img src="${posterUrl}" alt="${movie.title}" loading="lazy" onload="this.classList.add('poster-loaded');" onerror="handleImageLoadError(this, '${escapedTitle}')" />`;
 
       card.innerHTML = `
         <div class="poster-wrap">

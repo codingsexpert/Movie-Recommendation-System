@@ -553,6 +553,29 @@ def sync_tmdb_endpoint(background_tasks: BackgroundTasks):
         "message": "TMDB sync launched in background. Trending movies will be added to the Knowledge Graph."
     }
 
+import requests
+import os
+from fastapi.responses import RedirectResponse
+
+@app.get("/api/poster")
+def get_movie_poster(title: str):
+    """Fetch movie poster dynamically from TMDB and redirect to image URL."""
+    fallback_url = "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg"
+    tmdb_key = os.getenv("TMDB_API_KEY")
+    if not tmdb_key:
+        return RedirectResponse(url=fallback_url)
+        
+    try:
+        url = f"https://api.themoviedb.org/3/search/movie?api_key={tmdb_key}&query={title}"
+        res = requests.get(url, timeout=3)
+        results = res.json().get("results", [])
+        if results and results[0].get("poster_path"):
+            return RedirectResponse(url=f"https://image.tmdb.org/t/p/w500{results[0]['poster_path']}")
+    except Exception:
+        pass
+        
+    return RedirectResponse(url=fallback_url)
+
 from cache_manager import get_cached_response, set_cached_response, generate_cache_key
 from intent_resolver import process_query_intent
 
