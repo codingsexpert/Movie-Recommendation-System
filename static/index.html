@@ -63,84 +63,91 @@
 
   <!-- ═══════════ Unified Hero + Search Section ═══════════ -->
   <section class="hero-spotlight" id="heroSpotlight">
-    <div class="spotlight-bg" id="spotlightBg" style="background-image: url('https://image.tmdb.org/t/p/w1280/8ZTVqvKDQ8emSGUEMjsS4yHAiE.jpg');"></div>
+    <div class="spotlight-bg" id="spotlightBg" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80');"></div>
     <div class="spotlight-overlay"></div>
 
-    <div class="spotlight-content">
-      <div class="spotlight-badge">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        <span>FEATURED</span>
+    <div class="spotlight-container">
+      <!-- Floating Hero Movie Poster Card -->
+      <div class="spotlight-poster-card" id="spotlightPosterCard">
+        <img id="spotlightPosterImg" src="https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg" alt="Poster" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80'" />
       </div>
 
-      <h1 class="spotlight-title" id="spotlightTitle">Inception</h1>
-
-      <div class="spotlight-meta">
-        <span class="meta-year" id="spotlightYear">2010</span>
-        <span class="meta-divider"></span>
-        <span class="meta-director" id="spotlightDirector">Christopher Nolan</span>
-        <span class="meta-divider"></span>
-        <span class="meta-genre">Sci-Fi • Action • Thriller</span>
-        <span class="meta-divider"></span>
-        <span class="meta-award"><svg class="icon-trophy" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 0-6 6v3.5c0 1.66 1.34 3 3 3h6c1.66 0 3-1.34 3-3V8a6 6 0 0 0-6-6z"></path></svg>Oscar Winner</span>
-        <span class="spotlight-rating" id="spotlightRating"><svg class="icon-star" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>8.8</span>
-      </div>
-
-      <div class="spotlight-actions">
-        <button class="btn-primary" id="spotlightRecommendBtn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <span>Similar</span>
-        </button>
-        <button class="btn-trailer" id="spotlightTrailerBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>Trailer</span>
-        </button>
-        <button class="btn-secondary" id="spotlightGraphBtn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-          <span>Graph</span>
-        </button>
-      </div>
-
-      <!-- Integrated AI Search Bar -->
-      <div class="hero-search-wrapper" id="searchSection">
-        <div class="search-input-container" style="position: relative; width: 100%;">
-          <form id="searchForm" class="search-box">
-            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-
-            <input
-              type="text"
-              id="queryInput"
-              placeholder="Search movies, actors, directors..."
-              autocomplete="off"
-              required
-            />
-
-            <button type="button" id="micBtn" class="mic-btn" title="Voice Search">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                <line x1="12" y1="19" x2="12" y2="23"></line>
-                <line x1="8" y1="23" x2="16" y2="23"></line>
-              </svg>
-            </button>
-
-            <button type="submit" id="searchBtn" class="submit-btn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: -1.5px;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"></path></svg>
-              <span>Ask AI</span>
-            </button>
-          </form>
-          <!-- Suggestions Dropdown -->
-          <div id="suggestionsDropdown" class="suggestions-dropdown hidden"></div>
+      <div class="spotlight-content">
+        <div class="spotlight-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <span>FEATURED</span>
         </div>
 
-        <!-- Quick Prompt Chips -->
-        <div class="quick-prompts">
-          <button class="prompt-chip" data-query="Recommend movies similar to Inception">Similar to Inception</button>
-          <button class="prompt-chip" data-query="Nolan ki sabse acchi movie konsi hai">Best Nolan</button>
-          <button class="prompt-chip" data-query="Which movies directed by Christopher Nolan won Oscars?">Oscar Winners</button>
-          <button class="prompt-chip" data-query="What movies has Leonardo DiCaprio acted in?">DiCaprio Films</button>
+        <h1 class="spotlight-title" id="spotlightTitle">Inception</h1>
+
+        <div class="spotlight-meta">
+          <span class="meta-year" id="spotlightYear">2010</span>
+          <span class="meta-divider"></span>
+          <span class="meta-director" id="spotlightDirector">Christopher Nolan</span>
+          <span class="meta-divider"></span>
+          <span class="meta-genre">Sci-Fi • Action • Thriller</span>
+          <span class="meta-divider"></span>
+          <span class="meta-award"><svg class="icon-trophy" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 0-6 6v3.5c0 1.66 1.34 3 3 3h6c1.66 0 3-1.34 3-3V8a6 6 0 0 0-6-6z"></path></svg>Oscar Winner</span>
+          <span class="spotlight-rating" id="spotlightRating"><svg class="icon-star" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>8.8</span>
+        </div>
+
+        <div class="spotlight-actions">
+          <button class="btn-primary" id="spotlightRecommendBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Similar</span>
+          </button>
+          <button class="btn-trailer" id="spotlightTrailerBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <span>Trailer</span>
+          </button>
+          <button class="btn-secondary" id="spotlightGraphBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span>Graph</span>
+          </button>
+        </div>
+
+        <!-- Integrated AI Search Bar -->
+        <div class="hero-search-wrapper" id="searchSection">
+          <div class="search-input-container" style="position: relative; width: 100%;">
+            <form id="searchForm" class="search-box">
+              <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+
+              <input
+                type="text"
+                id="queryInput"
+                placeholder="Search movies, actors, directors..."
+                autocomplete="off"
+                required
+              />
+
+              <button type="button" id="micBtn" class="mic-btn" title="Voice Search">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" y1="19" x2="12" y2="23"></line>
+                  <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+              </button>
+
+              <button type="submit" id="searchBtn" class="submit-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: -1.5px;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"></path></svg>
+                <span>Ask AI</span>
+              </button>
+            </form>
+            <!-- Suggestions Dropdown -->
+            <div id="suggestionsDropdown" class="suggestions-dropdown hidden"></div>
+          </div>
+
+          <!-- Quick Prompt Chips -->
+          <div class="quick-prompts">
+            <button class="prompt-chip" data-query="Recommend movies similar to Inception">Similar to Inception</button>
+            <button class="prompt-chip" data-query="Nolan ki sabse acchi movie konsi hai">Best Nolan</button>
+            <button class="prompt-chip" data-query="Which movies directed by Christopher Nolan won Oscars?">Oscar Winners</button>
+            <button class="prompt-chip" data-query="What movies has Leonardo DiCaprio acted in?">DiCaprio Films</button>
+          </div>
         </div>
       </div>
     </div>

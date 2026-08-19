@@ -208,14 +208,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 7000);
   }
 
+  const DEFAULT_CINEMA_BG = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80';
+
   function setSpotlight(movie) {
     currentSpotlight = movie;
     const content = document.querySelector('.spotlight-content');
+    const posterImg = document.getElementById('spotlightPosterImg');
+    const posterCard = document.getElementById('spotlightPosterCard');
+
     if (content) { content.style.opacity = '0'; content.style.transform = 'translateY(12px)'; }
+    if (posterCard) { posterCard.style.opacity = '0'; posterCard.style.transform = 'translateY(12px)'; }
 
     setTimeout(() => {
-      const backdropUrl = movie.backdrop || movie.poster || 'https://image.tmdb.org/t/p/w1280/8ZTVqvKDQ8emSGUEMjsS4yHAiE.jpg';
-      if (spotlightBg) spotlightBg.style.backgroundImage = `url('${backdropUrl}')`;
+      // 1. Update Floating Poster Card
+      if (posterImg && movie.poster) {
+        posterImg.src = movie.poster;
+      }
+
+      // 2. Preload & Set Hero Backdrop with multi-tier fallback
+      const primaryBg = movie.backdrop || movie.poster || DEFAULT_CINEMA_BG;
+      const bgTester = new Image();
+      bgTester.onload = () => {
+        if (spotlightBg) spotlightBg.style.backgroundImage = `url('${primaryBg}')`;
+      };
+      bgTester.onerror = () => {
+        // Fallback to poster or Unsplash cinema backdrop if 404
+        const fallbackBg = movie.poster || DEFAULT_CINEMA_BG;
+        if (spotlightBg) spotlightBg.style.backgroundImage = `url('${fallbackBg}')`;
+      };
+      bgTester.src = primaryBg;
+
       if (spotlightTitle)    spotlightTitle.textContent    = movie.title || '';
       if (spotlightYear)     spotlightYear.textContent     = movie.year || '';
       if (spotlightDirector) spotlightDirector.textContent = movie.directors ? movie.directors[0] : '';
@@ -236,6 +258,11 @@ document.addEventListener('DOMContentLoaded', () => {
           content.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
           content.style.opacity = '1';
           content.style.transform = 'translateY(0)';
+          if (posterCard) {
+            posterCard.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+            posterCard.style.opacity = '1';
+            posterCard.style.transform = 'translateY(0)';
+          }
         }, 50);
       }
     }, 250);

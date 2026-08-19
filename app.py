@@ -174,8 +174,8 @@ FALLBACK_CATALOG = [
         "genres": ["Sci-Fi", "Adventure", "Action"],
         "themes": ["Prophecy", "Desert Planet", "Empire"],
         "awards": ["Blockbuster Critical Acclaim"],
-        "poster": "https://image.tmdb.org/t/p/w500/1pdfLvPOLMag8StABMwMvChg7rvi.jpg",
-        "backdrop": "https://image.tmdb.org/t/p/w1280/xOM08Go8DFBhidHYxP6yA46UTv8.jpg",
+        "poster": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=80",
+        "backdrop": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1600&q=80",
         "trailer": "https://www.youtube.com/embed/Way9Dexny3w"
     },
     {
