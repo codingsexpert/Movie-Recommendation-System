@@ -2320,3 +2320,186 @@ body.light-theme .ambient-glow-bg,
 .suggestion-item:hover svg {
   color: var(--accent);
 }
+
+/* ─── Skeleton Loader Shimmer ─── */
+.skeleton-card {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-md, 8px);
+  background: linear-gradient(110deg, #1a1d25 30%, #2a2d35 50%, #1a1d25 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+  min-width: 160px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ─── Error State Card ─── */
+.error-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  gap: 0.85rem;
+}
+
+.error-card svg {
+  color: #ef4444;
+  opacity: 0.6;
+}
+
+.error-card h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.error-card p {
+  font-size: 0.85rem;
+  color: var(--text-muted, #8f98b0);
+  max-width: 400px;
+}
+
+.error-card button {
+  margin-top: 0.5rem;
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.error-card button:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+/* ─── Search History Chips ─── */
+.search-history {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.85rem;
+  padding: 0 0.5rem;
+}
+
+.search-history-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted, #8f98b0);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.history-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.history-chip:hover {
+  background: rgba(0, 82, 212, 0.2);
+  border-color: rgba(0, 82, 212, 0.4);
+  color: #6fb1fc;
+}
+
+.history-chip .remove-chip {
+  font-size: 0.85rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.history-chip:hover .remove-chip {
+  opacity: 1;
+}
+
+/* ─── Detail Panel Director/Cast Info ─── */
+.panel-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 0 2rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 1rem;
+}
+
+.panel-detail-item label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted, #8f98b0);
+  margin-bottom: 0.25rem;
+}
+
+.panel-detail-item p {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+/* ─── Awards badge in panel ─── */
+.panel-awards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0 2rem 1rem;
+}
+
+.panel-award-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.1);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+}
+
+/* ─── Keyboard shortcut hint ─── */
+.keyboard-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  z-index: 500;
+  transition: opacity 0.3s;
+}
+
+.keyboard-hint kbd {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.6);
+}

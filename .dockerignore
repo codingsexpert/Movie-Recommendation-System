@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.git/
+.env
+.env.local
+node_modules/
+.DS_Store
+scratch/
+*.log
+.agents/

@@ -91,5 +91,64 @@ def fetch_trending_movies(limit=10):
     print("\n✅ TMDB Sync Complete!")
     return len(entities)
 
+def fetch_and_insert_movie_by_title(title: str) -> str | None:
+    """Fetch a specific movie by title from TMDB, insert to Neo4j & Pinecone, and return exact TMDB title."""
+    if not TMDB_API_KEY:
+        return None
+
+    search_url = f"{BASE_URL}/search/movie?api_key={TMDB_API_KEY}&query={title}"
+    try:
+        res = requests.get(search_url)
+        res.raise_for_status()
+        results = res.json().get("results", [])
+        if not results:
+            return None
+            
+        movie_basic = results[0]
+        movie_id = movie_basic["id"]
+        tmdb_title = movie_basic.get("title", "")
+        
+        detail_url = f"{BASE_URL}/movie/{movie_id}?api_key={TMDB_API_KEY}&append_to_response=credits"
+        detail_res = requests.get(detail_url)
+        if detail_res.status_code != 200:
+            return None
+            
+        details = detail_res.json()
+        release_date = details.get("release_date", "")
+        year = int(release_date.split("-")[0]) if release_date else None
+        genres = [g["name"] for g in details.get("genres", [])]
+        credits = details.get("credits", {})
+        cast = [c["name"] for c in credits.get("cast", [])[:5]]
+        crew = credits.get("crew", [])
+        director = next((c["name"] for c in crew if c.get("job") == "Director"), None)
+        
+        entity = {
+            "movie": {"title": tmdb_title, "year": year},
+            "director": {"name": director} if director else {},
+            "actors": cast,
+            "genres": genres,
+            "themes": [],
+            "awards": []
+        }
+        
+        overview = details.get("overview", "")
+        chunk_text = f"Movie Title: {tmdb_title}\nRelease Year: {year}\nDirector: {director}\nActors: {', '.join(cast)}\nGenres: {', '.join(genres)}\nOverview: {overview}"
+        vector = embed_text(chunk_text)
+        
+        # Insert to Neo4j
+        build_graph([entity])
+        
+        # Upsert to Pinecone
+        pinecone_index.upsert(vectors=[{
+            "id": f"tmdb-{movie_id}",
+            "values": vector,
+            "metadata": {"text": chunk_text}
+        }])
+        
+        return tmdb_title
+    except Exception as e:
+        print(f"⚠️ TMDB fetch failed for '{title}': {e}")
+        return None
+
 if __name__ == "__main__":
     fetch_trending_movies()

@@ -1,9 +1,12 @@
 import os
 import json
 import shutil
-from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks
+import time
+from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from config import driver, pinecone_index
@@ -12,17 +15,33 @@ from similarity_handler import handle_similarity_query
 from run_indexing import run_indexing
 from tracking_handler import router as tracking_router
 
-app = FastAPI(title="GraphRAG Movie Recommendation Engine")
+app = FastAPI(
+    title="GraphRAG Movie Recommendation Engine",
+    version="2.0.0",
+    description="AI-powered movie recommendation engine using Knowledge Graphs, Vector Search, and Gemini LLM."
+)
 app.include_router(tracking_router)
+
+# GZip compression — compress responses larger than 500 bytes
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:8050", "http://127.0.0.1:8050", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Request timing middleware
+@app.middleware("http")
+async def add_timing_header(request: Request, call_next):
+    start = time.time()
+    response = await call_next(request)
+    elapsed = round((time.time() - start) * 1000, 1)
+    response.headers["X-Response-Time"] = f"{elapsed}ms"
+    return response
 
 class QueryRequest(BaseModel):
     query: str
@@ -35,6 +54,42 @@ class QuizRequest(BaseModel):
     mood: str
     genre: str
     era: str
+
+_server_start_time = time.time()
+
+@app.get("/api/health")
+def health_check():
+    """Health check endpoint for monitoring and Docker."""
+    neo4j_ok = False
+    pinecone_ok = False
+    
+    if driver:
+        try:
+            driver.verify_connectivity()
+            neo4j_ok = True
+        except Exception:
+            pass
+    
+    if pinecone_index:
+        try:
+            pinecone_index.describe_index_stats()
+            pinecone_ok = True
+        except Exception:
+            pass
+    
+    uptime_seconds = round(time.time() - _server_start_time)
+    status = "healthy" if (neo4j_ok or pinecone_ok) else "degraded"
+    
+    return {
+        "status": status,
+        "version": "2.0.0",
+        "uptime_seconds": uptime_seconds,
+        "services": {
+            "neo4j": "connected" if neo4j_ok else "disconnected",
+            "pinecone": "connected" if pinecone_ok else "disconnected",
+            "gemini": "configured" if os.getenv("GEMINI_API_KEY") else "not configured"
+        }
+    }
 
 @app.get("/api/stats")
 def get_stats():

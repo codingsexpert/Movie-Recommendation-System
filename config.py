@@ -78,9 +78,13 @@ if GEMINI_API_KEY:
 
 # =====================================================================
 # 4. GEMINI EMBEDDINGS (gemini-embedding-001 -> 3072 dimensions)
+#    With LRU caching to avoid redundant API calls
 # =====================================================================
-def embed_text(text: str) -> list[float]:
-    """Embed ONE text -> returns 3072-dim vector."""
+from functools import lru_cache
+
+@lru_cache(maxsize=1024)
+def embed_text(text: str) -> tuple:
+    """Embed ONE text -> returns 3072-dim vector (cached as tuple for hashability)."""
     if not genai_client:
         raise ValueError("GEMINI_API_KEY is not configured in .env")
     
@@ -89,9 +93,9 @@ def embed_text(text: str) -> list[float]:
         contents=text
     )
     if hasattr(response, "embedding") and response.embedding and response.embedding.values:
-        return response.embedding.values
+        return tuple(response.embedding.values)
     elif hasattr(response, "embeddings") and response.embeddings and len(response.embeddings) > 0:
-        return response.embeddings[0].values
+        return tuple(response.embeddings[0].values)
     else:
         raise ValueError("Unexpected embedding response structure")
 
